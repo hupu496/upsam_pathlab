@@ -8,7 +8,28 @@
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.8/js/dataTables.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <?php if($this->session->flashdata('success')): ?>
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Success',
+    text: '<?= $this->session->flashdata('success'); ?>',
+    confirmButtonText: 'OK'
+});
+</script>
+<?php endif; ?>
+
+<?php if($this->session->flashdata('error')): ?>
+<script>
+Swal.fire({
+    icon: 'error',
+    title: 'Error',
+    text: '<?= $this->session->flashdata('error'); ?>',
+    confirmButtonText: 'OK'
+});
+</script>
+<?php endif; ?>
    
     <script>
         new DataTable('#alumniTable', {

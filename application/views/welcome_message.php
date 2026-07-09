@@ -283,7 +283,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <div class="login-header">
         <h1>🔐 Welcome back</h1>
         <div class="sub">
-            <strong>CodeIgniter</strong> · secure login
+            <strong>Upsam Diagnostic</strong> · secure login
         </div>
     </div>
 

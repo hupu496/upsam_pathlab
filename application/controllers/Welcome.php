@@ -11,33 +11,41 @@ class Welcome extends CI_Controller {
 	{
 		$this->load->view('welcome_message');
 	}
-	public function validatelogin(){
-   
-    $data = [
-        'email'     => $this->input->post('email'),
-        'password'  => $this->input->post('password'),
-        'added_on'  => date('Y-m-d H:i:s'),
-        'status'    => 1
-    ];
+	public function validatelogin()
+{
+    $email = $this->input->post('email');
+    $password = $this->input->post('password');
 
-    $result = $this->db->get_where('users', array(
-        'email' => $data['email']
-    ))->row_array();
-   
-    if ($result['password'] == $data['password']) {
-        echo json_encode(['status' => 'success']);
+    $result = $this->db->get_where('users', [
+        'email' => $email
+    ])->row_array();
+
+    if ($result && $result['password'] == $password) {
+
+        // Set session if needed
+        $this->session->set_userdata([
+            'userid'   => $result['id'],
+            'username' => $result['name']
+        ]);
+
         redirect('welcome/dashboard');
+
     } else {
-        echo json_encode(['status' => 'error']);
+
         redirect('welcome/index');
     }
-        $this->load->view('masters/index', $data);
-
-	}
+}
     public function dashboard(){
-      
-        $this->load->view('admin/service/top-section',$data);
-        $this->load->view('admin/service/dashboard',$data);
-        $this->load->view('admin/service/footer',$data);
+       $data['lab']=$this->db->get_where('lab_master',array('status'=>1))->result_array();
+       $data['product']=$this->db->get_where('product_master',array('status'=>1))->result_array();
+       $data['center']=$this->db->get_where('center_master',array('status'=>1))->result_array();
+       $data['doctor']=$this->db->get_where('doctor_master',array('status'=>1))->result_array();
+       $data['total_doctors']=count($data['doctor']);
+       $data['total_centers']=count($data['center']);
+       $data['total_labs']=count($data['lab']);
+       $data['total_products']=count($data['product']);
+       $this->load->view('admin/service/top-section',$data);
+       $this->load->view('admin/service/dashboard',$data);
+       $this->load->view('admin/service/footer',$data);
     }
 }

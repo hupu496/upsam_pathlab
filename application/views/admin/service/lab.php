@@ -26,40 +26,31 @@
                         </thead>
                         <tbody>
                             <!-- Sample Data - Replace with database data -->
-                            <tr>
-                                <td>1</td>
-                                <td>Central Diagnostic Lab</td>
-                                <td>LAB001</td>
-                                <td>123 Main Street, City</td>
-                                <td>+1 234 567 8900</td>
-                                <td>info@centrallab.com</td>
-                                <td>Dr. John Smith</td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm" onclick="editLab(1)">
+                             <?php $i=0;
+                             foreach ($lab_master as $key => $value) {
+                                $i++;
+                                ?>
+                             <tr>
+                                <td><?php echo $i; ?></td>
+                                <td><?php echo $value['name'] ?></td>
+                                <td><?php echo $value['lab_code']; ?></td>
+                                <td><?php echo $value['address'];?></td>
+                                <td><?php echo $value['phone']; ?></td>
+                                <td><?php echo $value['email']; ?></td>
+                                <td><?php echo $value['contact']; ?></td>
+                               <td>
+                                    <a class="btn btn-warning btn-sm" onclick="editLab(<?php echo $value['id']; ?>)">
                                         <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteLab(1)">
+                                    </a>
+                                    <a href="<?php echo base_url('masters/lab_delete/'.$value['id'].''); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this lab?')">
                                         <i class="fas fa-trash"></i>
-                                    </button>
+                                    </a>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>City Medical Lab</td>
-                                <td>LAB002</td>
-                                <td>456 Oak Avenue, Town</td>
-                                <td>+1 234 567 8901</td>
-                                <td>contact@citylab.com</td>
-                                <td>Dr. Sarah Johnson</td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm" onclick="editLab(2)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteLab(2)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
+                              
+                           <?php   }  ?>
+                            
+                           
                         </tbody>
                     </table>
                 </div>
@@ -76,32 +67,36 @@
                 <h5 class="modal-title"><i class="fas fa-flask"></i> Add New Lab</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="<?php echo base_url('admin/lab_master/add'); ?>" method="POST">
+            <form action="<?php echo base_url('masters/lab_add'); ?>" method="POST">
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-12 mb-3">
                             <label for="lab_name" class="form-label">Lab Name *</label>
-                            <input type="text" class="form-control" id="lab_name" name="lab_name" required>
+                            <input type="text" class="form-control" id="lab_name" name="name" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="lab_code" class="form-label">Lab Code *</label>
-                            <input type="text" class="form-control" id="lab_code" name="lab_code" required>
-                        </div>
+                       
                         <div class="col-md-12 mb-3">
                             <label for="lab_address" class="form-label">Address *</label>
-                            <textarea class="form-control" id="lab_address" name="lab_address" rows="2" required></textarea>
+                            <textarea class="form-control" id="lab_address" name="address" rows="2" required></textarea>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="lab_phone" class="form-label">Phone *</label>
-                            <input type="tel" class="form-control" id="lab_phone" name="lab_phone" required>
+                           <input type="tel"
+                                class="form-control"
+                                id="lab_phone"
+                                name="phone"
+                                pattern="[6-9]{1}[0-9]{9}"
+                                maxlength="10"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)"
+                                required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="lab_email" class="form-label">Email *</label>
-                            <input type="email" class="form-control" id="lab_email" name="lab_email" required>
+                            <input type="email" class="form-control" id="lab_email" name="email" required>
                         </div>
                         <div class="col-md-12 mb-3">
                             <label for="control_person" class="form-label">Control Person *</label>
-                            <input type="text" class="form-control" id="control_person" name="control_person" required>
+                            <input type="text" class="form-control" id="control_person" name="contact" required>
                         </div>
                     </div>
                 </div>
@@ -113,7 +108,71 @@
         </div>
     </div>
 </div>
-
+<!-- Edit Lab Modal -->
+<div class="modal fade" id="editLabModal" tabindex="-1" role="dialog" aria-labelledby="editLabModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editLabModalLabel">Edit Lab Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editLabForm">
+                    <input type="hidden" id="edit_lab_id" name="id">
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Lab Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="edit_lab_name" name="name" required>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Address <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="edit_address" name="address" rows="2" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Phone <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="edit_phone" name="phone" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="edit_email" name="email" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Contact Person <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="edit_contact" name="contact" required>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" id="updateLabBtn">Update Lab</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 $(document).ready(function() {
     $('#labTable').DataTable({
@@ -129,11 +188,74 @@ function editLab(id) {
     alert('Edit lab with ID: ' + id);
 }
 
-function deleteLab(id) {
-    if(confirm('Are you sure you want to delete this lab?')) {
-        // Implement delete functionality
-        alert('Delete lab with ID: ' + id);
-    }
+
+
+// Edit Lab Function
+function editLab(id) {
+    // Make AJAX request to get lab data
+    $.ajax({
+        url: '<?php echo base_url("masters/get_lab_data"); ?>',
+        type: 'POST',
+        data: { id: id },
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                // Populate the modal fields
+                $('#edit_lab_id').val(response.data.id);
+                $('#edit_lab_name').val(response.data.name);
+                $('#edit_address').val(response.data.address);
+                $('#edit_phone').val(response.data.phone);
+                $('#edit_email').val(response.data.email);
+                $('#edit_contact').val(response.data.contact);
+                
+                // Show the modal
+                $('#editLabModal').modal('show');
+            } else {
+                alert('Error fetching lab data');
+            }
+        },
+        error: function() {
+            alert('Error fetching lab data');
+        }
+    });
 }
+
+// Update Lab Function
+$('#updateLabBtn').click(function (e) {
+    e.preventDefault();
+
+    var formData = $('#editLabForm').serialize();
+
+    console.log(formData);
+
+    $.ajax({
+        url: "<?php echo base_url('masters/lab_update'); ?>",
+        type: "POST",
+        data: formData,
+        dataType: "json",
+
+        beforeSend: function () {
+            console.log("Sending...");
+        },
+
+        success: function (response) {
+            console.log(response);
+
+            if (response.status == "success") {
+                alert("Updated Successfully");
+                location.reload();
+            } else {
+                alert(response.message);
+            }
+        },
+
+        error: function (xhr) {
+            console.log(xhr.responseText);
+        }
+    });
+});
+
+// Optional: Close modal and reset form
+
 </script>
 
