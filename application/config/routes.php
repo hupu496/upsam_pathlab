@@ -12,11 +12,15 @@ $route['masters'] = 'masters/index';
 $route['masters/lab'] = 'masters/lab';
 $route['masters/lab_delete'] = 'masters/lab_delete';
 $route['masters/center'] = 'masters/center';
+$route['masters/add_center'] = 'masters/add_center';
+$route['masters/center_delete'] = 'masters/center_delete';
+
 $route['masters/doctor'] = 'masters/doctor';
 $route['masters/patient'] = 'masters/patient';
 $route['masters/test'] = 'masters/test';
 $route['masters/lab_add'] = 'masters/lab_add';  
 $route['masters/lab_update'] = 'masters/lab_update';      
+$route['masters/center_update'] = 'masters/center_update';  
 // Workflow Routes
 // ==================== PATIENT REGISTRATION ROUTES ====================
 $route['admin/patient'] = 'admin/patient/index';

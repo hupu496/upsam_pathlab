@@ -23,54 +23,26 @@
                         </thead>
                         <tbody>
                             <!-- Sample Data - Replace with database data -->
-                            <tr>
-                                <td>1</td>
-                                <td>DOC001</td>
-                                <td>Dr. John Smith</td>
-                                <td>MD, PhD</td>
-                                <td>dr.smith@hospital.com</td>
-                                <td>+1 234 567 8920</td>
+                             <?php
+                             $i=0; 
+                             foreach ($doctor as $key => $value) { $i++;?>
+                                 <tr>
+                                <td><?php echo $i; ?></td>
+                                <td><?php echo $value['doctor_code'];?></td>
+                                <td><?php echo $value['doctor_name']; ?></td>
+                                <td><?php echo $value['qualification']; ?></td>
+                                <td><?php echo $value['email']; ?></td>
+                                <td><?php echo $value['phone']; ?></td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm" onclick="editDoctor(1)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteDoctor(1)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    <a class="btn btn-warning btn-sm" onclick="editdoctor(<?php echo $value['id']; ?>)">
+                                        <i class="fas fa-edit"></i></a>
+                                    <a href="<?php echo base_url('masters/doctor_delete/'.$value['id'].''); ?>" class="btn btn-danger btn-sm" >
+                                        <i class="fas fa-trash"></i></a>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>DOC002</td>
-                                <td>Dr. Sarah Johnson</td>
-                                <td>MBBS, MS</td>
-                                <td>dr.johnson@medical.com</td>
-                                <td>+1 234 567 8921</td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm" onclick="editDoctor(2)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteDoctor(2)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>DOC003</td>
-                                <td>Dr. Michael Brown</td>
-                                <td>MD, FACS</td>
-                                <td>dr.brown@healthcare.com</td>
-                                <td>+1 234 567 8922</td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm" onclick="editDoctor(3)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteDoctor(3)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
+                             <?php  }  ?>
+                         
+                         
                         </tbody>
                     </table>
                 </div>
@@ -87,29 +59,26 @@
                 <h5 class="modal-title"><i class="fas fa-user-md"></i> Add New Doctor</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="<?php echo base_url('admin/doctor_master/add'); ?>" method="POST">
+            <form action="<?php echo base_url('masters/add_doctor'); ?>" method="POST">
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="doctor_id" class="form-label">Doctor ID *</label>
-                            <input type="text" class="form-control" id="doctor_id" name="doctor_id" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
+                        
+                        <div class="col-md-12 mb-3">
                             <label for="doctor_name" class="form-label">Doctor Name *</label>
                             <input type="text" class="form-control" id="doctor_name" name="doctor_name" required>
                         </div>
                         <div class="col-md-12 mb-3">
                             <label for="doctor_qualification" class="form-label">Qualification *</label>
-                            <input type="text" class="form-control" id="doctor_qualification" name="doctor_qualification" 
+                            <input type="text" class="form-control" id="doctor_qualification" name="qualification" 
                                    placeholder="e.g., MD, PhD, MBBS, MS" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="doctor_email" class="form-label">Email *</label>
-                            <input type="email" class="form-control" id="doctor_email" name="doctor_email" required>
+                            <input type="email" class="form-control" id="doctor_email" name="email" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="doctor_phone" class="form-label">Phone *</label>
-                            <input type="tel" class="form-control" id="doctor_phone" name="doctor_phone" required>
+                            <input type="tel" class="form-control" id="doctor_phone" name="phone" required>
                         </div>
                     </div>
                 </div>
@@ -122,25 +91,147 @@
     </div>
 </div>
 
+<div class="modal fade" id="editLabModal" tabindex="-1" role="dialog" aria-labelledby="editLabModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editLabModalLabel">Edit Doctor Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editLabForm">
+                    <input type="hidden" id="edit_doctor_id" name="id">
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Center Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="edit_doctor_name" name="doctor_name" required>
+                            </div>
+                        </div>
+                        
+                    </div>
+                   
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Address <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="edit_qualification" name="qualification" rows="2" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Phone <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="edit_phone" name="phone"pattern="[6-9]{1}[0-9]{9}"
+                                maxlength="10"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="edit_email" name="email" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" id="updateLabBtn">Update Lab</button>
+            </div>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
 <script>
-$(document).ready(function() {
-    $('#doctorTable').DataTable({
+$(document).ready(function () {
+
+    $("#editLabForm").on("submit", function (e) {
+
+        e.preventDefault();
+
+        $.ajax({
+            url: "<?php echo base_url('masters/doctor_update'); ?>",
+            type: "POST",
+            data: $(this).serialize(),
+            dataType: "json",
+
+            success: function (response) {
+
+                if (response.status === "success") {
+                    alert("Updated Successfully");
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            },
+
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+
+    });
+
+});
+</script>
+<script>
+$(document).ready(function () {
+
+    $('#labTable').DataTable({
         columnDefs: [
             { targets: [0], orderData: [0, 1] },
-            { targets: [1], orderData: [1, 0] },
-            { targets: [2], orderData: [2, 0] }
+            { targets: [1], orderData: [1, 0] }
         ]
     });
+
+   
+
 });
 
-function editDoctor(id) {
-    alert('Edit doctor with ID: ' + id);
+// Edit Lab Function
+function editdoctor(id) {
+    // Make AJAX request to get lab data
+    $.ajax({
+        url: '<?php echo base_url("masters/get_doctor_data"); ?>',
+        type: 'POST',
+        data: { id: id },
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                // Populate the modal fields
+                $('#edit_doctor_id').val(response.data.id);
+                $('#edit_doctor_name').val(response.data.doctor_name);
+                $('#edit_qualification').val(response.data.qualification);
+                $('#edit_phone').val(response.data.phone);
+                $('#edit_email').val(response.data.email);
+                
+                // Show the modal
+                $('#editLabModal').modal('show');
+            } else {
+                alert('Error fetching lab data');
+            }
+        },
+        error: function() {
+            alert('Error fetching lab data');
+        }
+    });
 }
 
-function deleteDoctor(id) {
-    if(confirm('Are you sure you want to delete this doctor?')) {
-        alert('Delete doctor with ID: ' + id);
-    }
-}
+// Update Lab Function
 </script>
-

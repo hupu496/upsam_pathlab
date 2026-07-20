@@ -145,7 +145,9 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Phone <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="edit_phone" name="phone" required>
+                                <input type="text" class="form-control" id="edit_phone" name="phone"pattern="[6-9]{1}[0-9]{9}"
+                                maxlength="10"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" required>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -164,31 +166,69 @@
                             </div>
                         </div>
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
+                    <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button type="submit" class="btn btn-primary" id="updateLabBtn">Update Lab</button>
             </div>
+                </form>
+            </div>
+            
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
 <script>
-$(document).ready(function() {
+$(document).ready(function () {
+
+    $("#editLabForm").on("submit", function (e) {
+
+        e.preventDefault();
+
+        $.ajax({
+            url: "<?php echo base_url('masters/lab_update'); ?>",
+            type: "POST",
+            data: $(this).serialize(),
+            dataType: "json",
+
+            success: function (response) {
+
+                if (response.status === "success") {
+                    alert("Updated Successfully");
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            },
+
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+
+    });
+
+});
+</script>
+<script>
+$(document).ready(function () {
+
     $('#labTable').DataTable({
         columnDefs: [
             { targets: [0], orderData: [0, 1] },
             { targets: [1], orderData: [1, 0] }
         ]
     });
+
+   
+
 });
-
-function editLab(id) {
-    // Implement edit functionality
-    alert('Edit lab with ID: ' + id);
-}
-
-
 
 // Edit Lab Function
 function editLab(id) {
@@ -221,41 +261,5 @@ function editLab(id) {
 }
 
 // Update Lab Function
-$('#updateLabBtn').click(function (e) {
-    e.preventDefault();
-
-    var formData = $('#editLabForm').serialize();
-
-    console.log(formData);
-
-    $.ajax({
-        url: "<?php echo base_url('masters/lab_update'); ?>",
-        type: "POST",
-        data: formData,
-        dataType: "json",
-
-        beforeSend: function () {
-            console.log("Sending...");
-        },
-
-        success: function (response) {
-            console.log(response);
-
-            if (response.status == "success") {
-                alert("Updated Successfully");
-                location.reload();
-            } else {
-                alert(response.message);
-            }
-        },
-
-        error: function (xhr) {
-            console.log(xhr.responseText);
-        }
-    });
-});
-
-// Optional: Close modal and reset form
-
 </script>
 

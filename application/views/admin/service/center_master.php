@@ -24,43 +24,31 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Sample Data - Replace with database data -->
-                            <tr>
-                                <td>1</td>
-                                <td>CTR001</td>
-                                <td>Downtown Health Center</td>
-                                <td>LAB001</td>
-                                <td>+1 234 567 8910</td>
-                                <td>789 Elm Street, Downtown</td>
-                                <td>center@downtown.com</td>
-                                <td>Ms. Emily Davis</td>
+                           <?php
+                           $i=0;
+                            foreach ($center_master as $key => $value) { 
+                                $i++;?>
+                          <tr>
+                                <td><?php echo $i; ?></td>
+                                <td><?php echo $value['center_code']; ?></td>
+                                <td><?php echo $value['center_name']; ?></td>
+                                <td><?php echo $value['lab_code']; ?></td>
+                                <td><?php echo $value['phone']; ?></td>
+                                <td><?php echo $value['address']; ?></td>
+                                <td><?php echo $value['email']; ?></td>
+                                <td><?php echo $value['contact_person']; ?></td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm" onclick="editCenter(1)">
+                                    <a class="btn btn-warning btn-sm" onclick="editcenter(<?php echo $value['id']; ?>)">
                                         <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteCenter(1)">
+                                    </a>
+                                    <a href="<?php echo base_url('masters/center_delete/'.$value['id'].''); ?>" class="btn btn-danger btn-sm" >
                                         <i class="fas fa-trash"></i>
-                                    </button>
+                                    </a>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>CTR002</td>
-                                <td>Northside Medical Center</td>
-                                <td>LAB002</td>
-                                <td>+1 234 567 8911</td>
-                                <td>321 Pine Road, Northside</td>
-                                <td>info@northside.com</td>
-                                <td>Dr. Michael Brown</td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm" onclick="editCenter(2)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteCenter(2)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
+                         <?php  } ?>
+                            
+                           
                         </tbody>
                     </table>
                 </div>
@@ -77,14 +65,10 @@
                 <h5 class="modal-title"><i class="fas fa-building"></i> Add New Center</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="<?php echo base_url('admin/center_master/add'); ?>" method="POST">
+            <form action="<?php echo base_url('masters/add_center'); ?>" method="POST">
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="center_code" class="form-label">Center Code *</label>
-                            <input type="text" class="form-control" id="center_code" name="center_code" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-12 mb-3">
                             <label for="center_name" class="form-label">Center Name *</label>
                             <input type="text" class="form-control" id="center_name" name="center_name" required>
                         </div>
@@ -92,25 +76,29 @@
                             <label for="lab_id" class="form-label">Lab ID *</label>
                             <select class="form-control" id="lab_id" name="lab_id" required>
                                 <option value="">Select Lab</option>
-                                <option value="LAB001">LAB001 - Central Diagnostic Lab</option>
-                                <option value="LAB002">LAB002 - City Medical Lab</option>
+                                <?php foreach ($lab as $key => $value) {  ?>        
+                                   <option value="<?php echo $value['id']; ?>"><?php echo $value['lab_code'].' - '.$value['name']; ?></option>                          # code...
+                              <?php  }  ?>
+                           
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="center_phone" class="form-label">Phone *</label>
-                            <input type="tel" class="form-control" id="center_phone" name="center_phone" required>
+                            <input type="tel" class="form-control" id="center_phone" name="phone" pattern="[6-9]{1}[0-9]{9}"
+                                maxlength="10"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" required>
                         </div>
                         <div class="col-md-12 mb-3">
                             <label for="center_address" class="form-label">Address *</label>
-                            <textarea class="form-control" id="center_address" name="center_address" rows="2" required></textarea>
+                            <textarea class="form-control" id="center_address" name="address" rows="2" required></textarea>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="center_email" class="form-label">Email *</label>
-                            <input type="email" class="form-control" id="center_email" name="center_email" required>
+                            <input type="email" class="form-control" id="center_email" name="email" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="center_control_person" class="form-label">Control Person *</label>
-                            <input type="text" class="form-control" id="center_control_person" name="center_control_person" required>
+                            <input type="text" class="form-control" id="center_control_person" name="contact_person" required>
                         </div>
                     </div>
                 </div>
@@ -122,25 +110,171 @@
         </div>
     </div>
 </div>
+<!-- Edit Lab Modal -->
+<div class="modal fade" id="editLabModal" tabindex="-1" role="dialog" aria-labelledby="editLabModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editLabModalLabel">Edit Center Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editLabForm">
+                    <input type="hidden" id="edit_center_id" name="id">
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Center Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="edit_center_name" name="center_name" required>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="">Lab Id<span class="text-danger">*</span></label>
+                                <select class="form-control" id="edit_lab_id" name="lab_id" required>
+                                <option value="">Select Lab</option>
+                                <?php foreach ($lab as $key => $value) {  ?>        
+                                   <option value="<?php echo $value['id']; ?>"><?php echo $value['lab_code'].' - '.$value['name']; ?></option>                          # code...
+                              <?php  }  ?>
+                           
+                            </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Address <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="edit_address" name="address" rows="2" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Phone <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="edit_phone" name="phone"pattern="[6-9]{1}[0-9]{9}"
+                                maxlength="10"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="edit_email" name="email" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Contact Person <span class="text-danger">*</span></label>
+                                 <input type="text" class="form-control" id="edit_contact_person" name="contact_person" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" id="updateLabBtn">Update Lab</button>
+            </div>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
 <script>
-$(document).ready(function() {
-    $('#centerTable').DataTable({
+$(document).ready(function () {
+
+    $("#editLabForm").on("submit", function (e) {
+
+        e.preventDefault();
+
+        $.ajax({
+            url: "<?php echo base_url('masters/center_update'); ?>",
+            type: "POST",
+            data: $(this).serialize(),
+            dataType: "json",
+
+            success: function (response) {
+
+                if (response.status === "success") {
+                    alert("Updated Successfully");
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            },
+
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+
+    });
+
+});
+</script>
+<script>
+$(document).ready(function () {
+
+    $('#labTable').DataTable({
         columnDefs: [
             { targets: [0], orderData: [0, 1] },
-            { targets: [1], orderData: [1, 0] },
-            { targets: [2], orderData: [2, 0] }
+            { targets: [1], orderData: [1, 0] }
         ]
     });
+
+   
+
 });
 
-function editCenter(id) {
-    alert('Edit center with ID: ' + id);
+// Edit Lab Function
+function editcenter(id) {
+    // Make AJAX request to get lab data
+    $.ajax({
+        url: '<?php echo base_url("masters/get_center_data"); ?>',
+        type: 'POST',
+        data: { id: id },
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                // Populate the modal fields
+                $('#edit_center_id').val(response.data.id);
+                $('#edit_center_name').val(response.data.center_name);
+                $('#edit_lab_id option').prop('selected', false);
+                $('#edit_lab_id option[value="' + response.data.lab_id + '"]').prop('selected', true);
+                $('#edit_address').val(response.data.address);
+                $('#edit_phone').val(response.data.phone);
+                $('#edit_email').val(response.data.email);
+                $('#edit_contact_person').val(response.data.contact_person);
+                
+                // Show the modal
+                $('#editLabModal').modal('show');
+            } else {
+                alert('Error fetching lab data');
+            }
+        },
+        error: function() {
+            alert('Error fetching lab data');
+        }
+    });
 }
 
-function deleteCenter(id) {
-    if(confirm('Are you sure you want to delete this center?')) {
-        alert('Delete center with ID: ' + id);
-    }
-}
+// Update Lab Function
 </script>
