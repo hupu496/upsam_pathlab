@@ -125,7 +125,8 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Sub Product<span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="sub_product" name="edit_sub_product" rows="2" required></textarea>
+                                <input type="text" class="form-control" id="edit_sub_product" name="sub_product">
+                               
                             </div>
                         </div>
                     </div>
@@ -136,14 +137,14 @@
                                  <label for="value_rate" class="form-label">Value Rate *</label>
                             <div class="input-group">
                                 <span class="input-group-text">&#x20B9;</span>
-                                <input type="number" step="0.01" class="form-control" id="value_rate" name="edit_rate" required>
+                                <input type="number" step="0.01" class="form-control" id="edit_rate" name="rate" required>
                             </div>
                             
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                  <label for="measurement" class="form-label">Measurement *</label>
-                            <select class="form-control" id="measurement" name="unit" required>
+                            <select class="form-control" id="edit_unit" name="unit" required>
                                 <option value="">Select Measurement</option>
                                 <option value="Per Test">Per Test</option>
                                 <option value="Per Session">Per Session</option>
@@ -182,7 +183,7 @@ $(document).ready(function () {
         e.preventDefault();
 
         $.ajax({
-            url: "<?php echo base_url('masters/doctor_update'); ?>",
+            url: "<?php echo base_url('masters/product_update'); ?>",
             type: "POST",
             data: $(this).serialize(),
             dataType: "json",
@@ -232,10 +233,10 @@ function edit_product(id) {
             if (response.status === 'success') {
                 // Populate the modal fields
                 $('#edit_id').val(response.data.id);
-                $('#edit_doctor_name').val(response.data.doctor_name);
-                $('#edit_qualification').val(response.data.qualification);
-                $('#edit_phone').val(response.data.phone);
-                $('#edit_email').val(response.data.email);
+                $('#edit_product_name').val(response.data.product_name);
+                $('#edit_sub_product').val(response.data.sub_product);
+                $('#edit_rate').val(response.data.rate);
+                $('#edit_unit').val(response.data.unit);
                 
                 // Show the modal
                 $('#editLabModal').modal('show');

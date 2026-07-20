@@ -511,23 +511,21 @@
                 <div class="nav-item">
                     <a class="nav-link" data-bs-toggle="collapse" href="#settingsMenu" role="button" 
                        aria-expanded="false" aria-controls="settingsMenu">
-                        <i class="fas fa-cog"></i> Settings
+                        <i class="fas fa-cog"></i> User Management
                         <span class="arrow"><i class="fas fa-chevron-down"></i></span>
                     </a>
                     <div class="collapse" id="settingsMenu">
                         <nav class="nav flex-column">
-                            <a class="nav-link" href="<?php echo base_url('admin/settings/profile'); ?>">
-                                <i class="fas fa-user-cog"></i> Profile Settings
+                            <a class="nav-link" href="<?php echo base_url('masters/new_registration'); ?>">
+                                <i class="fas fa-user-cog"></i> New Registration
                             </a>
-                            <a class="nav-link" href="<?php echo base_url('admin/settings/system'); ?>">
-                                <i class="fas fa-server"></i> System Settings
+                            <a class="nav-link" href="<?php echo base_url('masters/changepassword'); ?>">
+                                <i class="fas fa-server"></i> Change Password
                             </a>
-                            <a class="nav-link" href="<?php echo base_url('admin/settings/backup'); ?>">
-                                <i class="fas fa-database"></i> Backup & Restore
+                            <a class="nav-link" href="<?php echo base_url('masters/changerole'); ?>">
+                                <i class="fas fa-database"></i>Change Role
                             </a>
-                            <a class="nav-link" href="<?php echo base_url('admin/settings/users'); ?>">
-                                <i class="fas fa-users-cog"></i> User Management
-                            </a>
+                          
                         </nav>
                     </div>
                 </div>

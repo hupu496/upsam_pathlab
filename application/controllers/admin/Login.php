@@ -14,7 +14,7 @@ class Login extends CI_Controller {
         $this->load->view('admin/service/login');
     }
     
-    public function validatelogin() {
+    public function validatelogin() {            
         $data = $this->input->post();
        
         if(empty($data['username']) || empty($data['password'])) {

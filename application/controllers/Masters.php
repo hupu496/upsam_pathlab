@@ -17,6 +17,9 @@ class Masters extends CI_Controller {
     }
 
     public function lab() {
+         if ($this->session->userdata('role') !== 'admin') {
+            redirect('login');
+        }
         $data['lab_master']=$this->db->get_where('lab_master',array('status'=>1))->result_array();
            $this->load->view('admin/service/top-section',$data);
            $this->load->view('admin/service/lab', $data);
@@ -406,6 +409,14 @@ public function product_update()
         $this->session->set_flashdata('error', 'Failed to delete product.');
     redirect('masters/test');
     }
+    }
+    public function new_registration(){
+        $data=[];
+        //    $data['product_master']= $this->db->get_where('product_master',array('status'=>1))->result_array();
+
+           $this->load->view('admin/service/top-section',$data);
+           $this->load->view('admin/service/new_registration', $data);
+           $this->load->view('admin/service/footer',$data);
     }
 
 
