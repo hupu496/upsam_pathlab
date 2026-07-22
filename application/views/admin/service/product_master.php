@@ -2,9 +2,9 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-box"></i> Product Master</h5>
+                <h5 class="mb-0"><i class="fas fa-box"></i> Test Master</h5>
                 <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                    <i class="fas fa-plus"></i> Add New Product
+                    <i class="fas fa-plus"></i> Add New Test
                 </button>
             </div>
             <div class="card-body">
@@ -13,8 +13,8 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Product Name</th>
-                                <th>Sub Product</th>
+                                <th>Test Name</th>
+                                <th>Sub Test</th>
                                 <th>Value Rate</th>
                                 <th>Measurement</th>
                                 <th>Actions</th>
@@ -53,45 +53,80 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-box"></i> Add New Product</h5>
+                <h5 class="modal-title">
+                    <i class="fas fa-box"></i> Add New Test
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
             <form action="<?php echo base_url('masters/add_product'); ?>" method="POST">
                 <div class="modal-body">
+
                     <div class="row">
+                        <!-- Test Name -->
                         <div class="col-md-6 mb-3">
-                            <label for="product_name" class="form-label">Product Name *</label>
-                            <input type="text" class="form-control" id="product_name" name="product_name" required>
+                            <label class="form-label">Test Name *</label>
+                            <input type="text" class="form-control" name="product_name" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="sub_product" class="form-label">Sub Product *</label>
-                            <input type="text" class="form-control" id="sub_product" name="sub_product" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="value_rate" class="form-label">Value Rate *</label>
-                            <div class="input-group">
-                                <span class="input-group-text">&#x20B9;</span>
-                                <input type="number" step="0.01" class="form-control" id="value_rate" name="rate" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="measurement" class="form-label">Measurement *</label>
-                            <select class="form-control" id="measurement" name="unit" required>
-                                <option value="">Select Measurement</option>
-                                <option value="Per Test">Per Test</option>
-                                <option value="Per Session">Per Session</option>
-                                <option value="Per Package">Per Package</option>
-                                <option value="Per Unit">Per Unit</option>
-                                <option value="Per Hour">Per Hour</option>
-                                <option value="Per Day">Per Day</option>
-                            </select>
-                        </div>
+
+                        <!-- Value Rate -->
+                        
                     </div>
+
+                    <hr>
+
+                    <h6>Sub Tests</h6>
+
+                    <div id="subTestContainer">
+
+                        <div class="row sub-test-row mb-2">
+
+                            <div class="col-md-3">
+                                <input type="text"
+                                       class="form-control"
+                                       name="sub_product[]"
+                                       placeholder="Sub Test"
+                                       required>
+                            </div>
+
+                            <div class="col-md-3">
+                                <input type="text"
+                                       class="form-control"
+                                       name="unit[]"
+                                       placeholder="Measurement"
+                                       required>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text"
+                                       class="form-control"
+                                       name="unit[]"
+                                       placeholder="Measurement"
+                                       required>
+                            </div>
+
+                            <div class="col-md-2">
+                                <button type="button"
+                                        class="btn btn-success addRow">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Product</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        Save Test
+                    </button>
                 </div>
+
             </form>
         </div>
     </div>
@@ -102,7 +137,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editLabModalLabel">Edit Product Details</h5>
+                <h5 class="modal-title" id="editLabModalLabel">Edit Test Details</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -175,6 +210,50 @@
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 
 <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+<script>
+$(document).ready(function(){
+
+    // Add new row
+    $(document).on('click','.addRow',function(){
+
+        var row = `
+        <div class="row sub-test-row mb-2">
+
+            <div class="col-md-5">
+                <input type="text"
+                       class="form-control"
+                       name="sub_product[]"
+                       placeholder="Sub Test"
+                       required>
+            </div>
+
+            <div class="col-md-5">
+                <input type="text"
+                       class="form-control"
+                       name="unit[]"
+                       placeholder="Measurement"
+                       required>
+            </div>
+
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger removeRow">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+
+        </div>`;
+
+        $("#subTestContainer").append(row);
+
+    });
+
+    // Remove row
+    $(document).on('click','.removeRow',function(){
+        $(this).closest('.sub-test-row').remove();
+    });
+
+});
+</script>
 <script>
 $(document).ready(function () {
 

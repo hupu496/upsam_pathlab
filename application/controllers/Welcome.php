@@ -11,6 +11,10 @@ class Welcome extends CI_Controller {
 	{
 		$this->load->view('welcome_message');
 	}
+public function registration_form(){
+    $this->load->view('registration_form');
+
+}
 	public function validatelogin()
 {
     $email = $this->input->post('email');
@@ -25,7 +29,7 @@ class Welcome extends CI_Controller {
         // Set session if needed
         $this->session->set_userdata([
             'userid'   => $result['id'],
-            'username' => $result['name']
+            'username' => $result['username']
         ]);
 
         redirect('welcome/dashboard');
@@ -36,6 +40,9 @@ class Welcome extends CI_Controller {
     }
 }
     public function dashboard(){
+         if(empty($this->session->userdata('userid'))) {
+            redirect('welcome/index');
+        }
        $data['lab']=$this->db->get_where('lab_master',array('status'=>1))->result_array();
        $data['product']=$this->db->get_where('product_master',array('status'=>1))->result_array();
        $data['center']=$this->db->get_where('center_master',array('status'=>1))->result_array();
@@ -47,5 +54,9 @@ class Welcome extends CI_Controller {
        $this->load->view('admin/service/top-section',$data);
        $this->load->view('admin/service/dashboard',$data);
        $this->load->view('admin/service/footer',$data);
+    }
+    public function logout() {
+        $this->session->sess_destroy();
+        redirect('welcome/index');
     }
 }

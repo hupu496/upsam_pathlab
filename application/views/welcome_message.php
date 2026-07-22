@@ -328,7 +328,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <!-- footer -->
     <div class="login-footer">
         <span>Don't have an account?</span>
-        <a href="#" onclick="alert('Sign-up page (demo).'); return false;">Create one</a>
+        <a href="<?php echo base_url('welcome/registration_form'); ?>" >Create one</a>
 
         <!-- CodeIgniter version / footer style (matches CI spirit) -->
         <div class="ci-badge">

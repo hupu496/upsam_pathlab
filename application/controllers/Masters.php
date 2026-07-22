@@ -412,11 +412,28 @@ public function product_update()
     }
     public function new_registration(){
         $data=[];
-        //    $data['product_master']= $this->db->get_where('product_master',array('status'=>1))->result_array();
-
+           $data['users']= $this->db->get_where('users',array('status>='=>0))->result_array();
+           $data['total_users'] = $this->db->get_where('users')->num_rows();
            $this->load->view('admin/service/top-section',$data);
            $this->load->view('admin/service/new_registration', $data);
            $this->load->view('admin/service/footer',$data);
+    }
+    public function save_registration(){
+        $data = $this->input->post();
+        $arr=[
+            'username'=>$data['username'],
+            'phone'=>$data['phone'],
+            'email'=>$data['email'],
+            'password'=>$data['password'],
+            'role'=>$data['role'],
+        ];
+        $result=$this->db->insert('users',$arr);
+        if($result){
+            $this->session->set_flashdata('success', 'Registration successfully. Wait for admin activation');
+        }else{
+                $this->session->set_flashdata('error', 'Failed to Registration.');
+        }
+        redirect('masters/new_registration');
     }
 
 

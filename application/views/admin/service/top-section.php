@@ -451,7 +451,7 @@
                             </a>
                             <a class="nav-link <?php echo ($this->uri->segment(2) == 'product_master') ? 'active' : ''; ?>" 
                                href="<?php echo base_url('masters/test'); ?>">
-                                <i class="fas fa-box"></i> Product Master
+                                <i class="fas fa-box"></i> Test Master
                             </a>
                         </nav>
                     </div>
@@ -535,7 +535,7 @@
                 
                 <!-- Logout -->
                 <div class="nav-item">
-                    <a class="nav-link" href="<?php echo base_url('login/logout'); ?>">
+                    <a class="nav-link" href="<?php echo base_url('welcome/logout'); ?>">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </div>
@@ -576,7 +576,7 @@
                     <span class="username">
                         <?php echo $username; ?>
                     </span>
-                    <a href="<?php echo base_url('login/logout'); ?>" class="text-danger d-md-none ms-2">
+                    <a href="<?php echo base_url('welcome/logout'); ?>" class="text-danger d-md-none ms-2">
                         <i class="fas fa-sign-out-alt"></i>
                     </a>
                 </div>

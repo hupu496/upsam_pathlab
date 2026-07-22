@@ -331,11 +331,11 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="user-avatar me-2" style="background: <?php echo getColor($user['name']); ?>;">
-                                                    <?php echo strtoupper(substr($user['name'], 0, 1)); ?>
+                                                    <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
                                                 </div>
                                                 <div>
-                                                    <div class="fw-semibold"><?php echo $user['name']; ?></div>
-                                                    <small class="text-muted">ID: <?php echo $user['user_id'] ?? 'USR' . str_pad($user['id'], 4, '0', STR_PAD_LEFT); ?></small>
+                                                    <div class="fw-semibold"><?php echo $user['username']; ?></div>
+                                                    <!-- <small class="text-muted">ID: <?php echo $user['user_id'] ?? 'USR' . str_pad($user['id'], 4, '0', STR_PAD_LEFT); ?></small> -->
                                                 </div>
                                             </div>
                                         </td>
@@ -390,7 +390,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form id="registrationForm" action="<?php echo base_url('admin/registration/save'); ?>" method="POST" novalidate>
+                <form id="registrationForm" action="<?php echo base_url('masters/save_registration'); ?>" method="POST" novalidate>
                     <input type="hidden" id="user_id" name="user_id" value="">
                     
                     <!-- Personal Information -->
@@ -401,7 +401,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Full Name <span class="required">*</span></label>
-                                <input type="text" class="form-control" id="name" name="name" 
+                                <input type="text" class="form-control" id="name" name="username" 
                                        placeholder="Enter full name" required 
                                        oninput="validateField(this)">
                                 <div class="form-text">Enter the user's full name</div>
@@ -461,13 +461,13 @@
                                     <option value="lab">Lab Technician</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <!-- <div class="col-md-6 mb-3">
                                 <label class="form-label">Status</label>
                                 <select class="form-select" id="status" name="status">
                                     <option value="active">Active</option>
                                     <option value="inactive">Inactive</option>
                                 </select>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                     
