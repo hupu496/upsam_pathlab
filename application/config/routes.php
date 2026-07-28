@@ -16,13 +16,17 @@ $route['masters/lab_delete'] = 'masters/lab_delete';
 $route['masters/center'] = 'masters/center';
 $route['masters/add_center'] = 'masters/add_center';
 $route['masters/center_delete'] = 'masters/center_delete';
-
+$route['get-sub-test'] = 'admin/patient/get_sub_test';
+$route['test_save'] = 'admin/patient/save';
 $route['masters/doctor'] = 'masters/doctor';
 $route['masters/patient'] = 'masters/patient';
 $route['masters/test'] = 'masters/test';
 $route['masters/lab_add'] = 'masters/lab_add';  
 $route['masters/lab_update'] = 'masters/lab_update';      
 $route['masters/center_update'] = 'masters/center_update';  
+$route['welcome/get/(:num)'] = 'welcome/get/$1';
+$route['welcome/delete/(:num)'] = 'welcome/delete/$1';
+$route['welcome/activate/(:num)'] = 'welcome/activate/$1';
 // Workflow Routes
 // ==================== PATIENT REGISTRATION ROUTES ====================
 $route['admin/patient'] = 'admin/patient/index';

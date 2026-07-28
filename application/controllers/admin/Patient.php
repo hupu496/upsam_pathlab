@@ -8,54 +8,149 @@ class Patient extends CI_Controller {
         $this->load->library('form_validation');
     }
     
-    public function index() {
-        // $data['patients'] = $this->Patient_model->get_all();
-        // $data['total_patients'] = $this->Patient_model->count_all();
-        $data=[];
-         $this->load->view('admin/service/top-section',$data);
+   public function index()
+{
+    // Product dropdown
+    $data['doctor'] = $this->db->get_where('doctor_master',array('status'=>1))->result_array();
+    $data['product_master'] = $this->db
+        ->select('id, product_name, sub_product, normal_values, rate, unit, status')
+        ->where('status', 1)
+        ->group_by('product_name')
+        ->get('product_master')
+        ->result_array();
+
+    // Pathology Report List
+    $data['reports'] = $this->db
+        ->select('
+           pathology_report.id,
+            pathology_report.report_date,
+            pathology_report.test_name,
+            patient_master.name,
+            patient_master.age,
+            patient_master.gender,
+            patient_master.mobile,
+        ')
+        ->from('patient_master')
+        ->join('pathology_report','pathology_report.patient_id = patient_master.id','left')
+        ->order_by('pathology_report.id','DESC')
+        ->get()
+        ->result_array();
+        // ->from('pathology_report_details')
+        // ->join('pathology_report', 'pathology_report.id = pathology_report_details.report_id', 'left')
+        // ->join('patient_master', 'patient_master.id = pathology_report.patient_id', 'left')
+        // ->join('product_master', 'product_master.id = pathology_report_details.product_id', 'left')
+        // ->order_by('pathology_report.id', 'DESC')
+        // ->get()
+        // ->result_array();
+
+        $this->load->view('admin/service/top-section', $data);
         $this->load->view('admin/service/patient_registration', $data);
-        $this->load->view('admin/service/footer',$data);
-        
-    }
+        $this->load->view('admin/service/footer', $data);
+}
     
-    public function save() {
-        $this->form_validation->set_rules('name', 'Name', 'required');
-        $this->form_validation->set_rules('age', 'Age', 'required|numeric');
-        $this->form_validation->set_rules('gender', 'Gender', 'required');
-        $this->form_validation->set_rules('mobile', 'Mobile', 'required|numeric|exact_length[10]');
-        $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
-        $this->form_validation->set_rules('address', 'Address', 'required');
-        
-        if ($this->form_validation->run() == FALSE) {
-            $this->session->set_flashdata('error', validation_errors());
-            redirect('admin/patient');
-        }
-        
-        $data = array(
-            'name' => $this->input->post('name'),
-            'age' => $this->input->post('age'),
-            'gender' => $this->input->post('gender'),
-            'mobile' => $this->input->post('mobile'),
-            'phone' => $this->input->post('phone'),
-            'email' => $this->input->post('email'),
-            'address' => $this->input->post('address'),
-            'status' => $this->input->post('status'),
-            'registration_date' => $this->input->post('registration_date')
-        );
-        
-        $id = $this->input->post('patient_id');
-        if (!empty($id)) {
-            $this->Patient_model->update($id, $data);
-            $this->session->set_flashdata('success', 'Patient updated successfully!');
-        } else {
-            $data['patient_id'] = 'PAT' . str_pad($this->Patient_model->get_next_id(), 4, '0', STR_PAD_LEFT);
-            $this->Patient_model->insert($data);
-            $this->session->set_flashdata('success', 'Patient registered successfully!');
-        }
-        
-        redirect('admin/patient');
-    }
+public function get_sub_test()
+{
+    $product_name = $this->input->post('product_name');
+   
+
+    $data = $this->db
+        ->where('product_name',$product_name)
+        ->where('status',1)
+        ->get('product_master')
+        ->result_array();
+
+    echo json_encode($data);
+}
+public function save()
+{
+    $this->db->trans_start();
+
+    // Save Patient
+    $patient = array(
+        'name'              => $this->input->post('name'),
+        'age'               => $this->input->post('age'),
+        'gender'            => $this->input->post('gender'),
+        'mobile'            => $this->input->post('mobile'),
+        'doctor'            => $this->input->post('doctor'),
+        'registration_date' => $this->input->post('registration_date')
+    );
+
+    $this->db->insert('patient_master', $patient);
+    $patient_id = $this->db->insert_id();
+
+    // Save Report Header
+    $report = array(
+        'patient_id'  => $patient_id,
+        'test_name'   => $this->input->post('test_name'),
+        'report_date' => date('Y-m-d')
+    );
+
+    $this->db->insert('pathology_report', $report);
+    $report_id = $this->db->insert_id();
+
+    // Save Report Details
+    $product_ids = $this->input->post('sub_product_id');
+    $results     = $this->input->post('result_value');
     
+    #which columns having values then save that particular column which column is not values not save on database
+    #means which product_ids having result values that product show on and save on database
+if (!empty($product_ids)) {
+
+    foreach ($product_ids as $k => $id) {
+
+        $result = isset($results[$k]) ? trim($results[$k]) : '';
+
+        // Skip if result is empty
+        if ($result == '') {
+            continue;
+        }
+
+        $product = $this->db
+            ->where('id', $id)
+            ->get('product_master')
+            ->row_array();
+
+        if ($product) {
+
+            $detail = array(
+                'report_id'     => $report_id,
+                'product_id'    => $product['id'],
+                'sub_product'   => $product['sub_product'],
+                'result_value'  => $result,
+                'normal_values' => $product['normal_values'],
+                'unit'          => $product['unit'],
+            );
+
+            $this->db->insert('pathology_report_details', $detail);
+        }
+    }
+}
+
+    $this->db->trans_complete();
+
+    if ($this->db->trans_status() === FALSE) {
+        show_error('Unable to save report.');
+    }
+
+    redirect('admin/patient/report/'.$report_id);
+}
+public function report($id)
+{
+    $data['patient']=$this->db
+    ->select('patient_master.*,pathology_report.test_name,pathology_report.report_date,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
+    ->from('pathology_report')
+    ->join('patient_master','patient_master.id=pathology_report.patient_id')
+    ->join('doctor_master','doctor_master.id = patient_master.doctor')
+    ->where('pathology_report.id',$id)
+    ->get()
+    ->row_array();
+
+    $data['details']=$this->db
+    ->where('report_id',$id)
+    ->get('pathology_report_details')
+    ->result_array();
+    $this->load->view('admin/service/report',$data);
+}
     public function get($id) {
         $patient = $this->Patient_model->get($id);
         if ($patient) {
@@ -65,23 +160,72 @@ class Patient extends CI_Controller {
         }
     }
     
-    public function delete($id) {
-        if ($this->Patient_model->delete($id)) {
-            echo json_encode(['status' => 'success']);
-        } else {
-            echo json_encode(['status' => 'error']);
+    public function delete($id)
+    {
+        $this->db->trans_start();
+
+        $report = $this->db
+            ->where('id',$id)
+            ->get('pathology_report')
+            ->row();
+
+        if($report){
+
+            $this->db->where('report_id',$id);
+            $this->db->delete('pathology_report_details');
+
+            $this->db->where('id',$id);
+            $this->db->delete('pathology_report');
+
+            $this->db->where('id',$report->patient_id);
+            $this->db->delete('patient_master');
+        }
+
+        $this->db->trans_complete();
+
+        if($this->db->trans_status()){
+            echo json_encode([
+                'status'=>'success',
+                'message'=>'Report deleted successfully.'
+            ]);
+        }else{
+            echo json_encode([
+                'status'=>'error',
+                'message'=>'Unable to delete report.'
+            ]);
         }
     }
     
-    public function view($id) {
-        $data['patient'] = $this->Patient_model->get($id);
-        $this->load->view('admin/patient_view', $data);
-    }
-    
-    public function print($id) {
-        $data['patient'] = $this->Patient_model->get($id);
-        $this->load->view('admin/patient_print', $data);
-    }
+   public function print($id)
+{
+    $data['patient'] = $this->db
+        ->select('
+            patient_master.*,patient_master.id as patientid,
+            pathology_report.id as report_id,
+            pathology_report.test_name,
+            pathology_report.report_date,doctor_master.id as doctorid,doctor_master.doctor_name
+        ')
+        ->from('pathology_report')
+        ->join('patient_master','patient_master.id=pathology_report.patient_id')
+        ->join('doctor_master','patient_master.doctor=doctor_master.id')
+        ->where('pathology_report.id',$id)
+        ->get()
+        ->row_array();
+        $data['details'] = $this->db
+        ->select('
+            pathology_report_details.*,
+            product_master.product_name,
+            product_master.sub_product
+        ')
+        ->from('pathology_report_details')
+        ->join('product_master','product_master.id=pathology_report_details.product_id')
+        ->where('pathology_report_details.report_id',$id)
+        ->order_by('pathology_report_details.id','ASC')
+        ->get()
+        ->result_array();
+
+    $this->load->view('admin/service/patient_print',$data);
+}
     
     public function export() {
         $patients = $this->Patient_model->get_all();

@@ -9,16 +9,16 @@ class Masters extends CI_Controller {
     }
 
     public function index() {
-        if ($this->session->userdata('role') !== 'admin') {
-            redirect('login');
+        if(empty($this->session->userdata('userid'))) {
+            redirect('welcome/index');
         }
         $data['title'] = "Master Management";
         $this->load->view('masters/index', $data);
     }
 
     public function lab() {
-         if ($this->session->userdata('role') !== 'admin') {
-            redirect('login');
+         if(empty($this->session->userdata('userid'))) {
+            redirect('welcome/index');
         }
         $data['lab_master']=$this->db->get_where('lab_master',array('status'=>1))->result_array();
            $this->load->view('admin/service/top-section',$data);
@@ -117,7 +117,10 @@ public function lab_update()
     }
    public function center()
 {
-    $data = [];
+     if(empty($this->session->userdata('userid'))) {
+            redirect('welcome/index');
+        }
+
     $data['center_master'] = $this->Master_model->center_master(array('t1.status'=>1));
     $data['lab'] = $this->db->get_where('lab_master',array('status'=>1))->result_array();
     
@@ -218,7 +221,9 @@ public function center_update()
     }
     }
      public function doctor() {
-          $data=[];
+        if(empty($this->session->userdata('userid'))) {
+            redirect('welcome/index');
+        }
           $data['doctor']=$this->db->get_where('doctor_master',array('status'=>1))->result_array();
            $this->load->view('admin/service/top-section',$data);
            $this->load->view('admin/service/doctor_master', $data);
@@ -314,26 +319,32 @@ public function doctor_update()
     }
     }
     public function test() {
-           $data=[];
+        if(empty($this->session->userdata('userid'))) {
+            redirect('welcome/index');
+        }
            $data['product_master']= $this->db->get_where('product_master',array('status'=>1))->result_array();
 
            $this->load->view('admin/service/top-section',$data);
            $this->load->view('admin/service/product_master', $data);
            $this->load->view('admin/service/footer',$data);
     }
-     public function add_product()
+public function add_product()
 {
-    $data = $this->input->post();
-    $last_id = $this->db->select('id')
-                    ->where('status',1)
-                    ->order_by('id','DESC')
-                    ->limit(1)
-                    ->get('product_master')
-                    ->row()
-                    ->id;
-    // $last_id+=1;
-    // $data['doctor_code'] = 'DR00'.$last_id;
+$product_name = $this->input->post('product_name');
+$sub_products = $this->input->post('sub_product');
+$units = $this->input->post('unit');
+$normal_values = $this->input->post('normal_values');
+foreach ($sub_products as $key => $sub) {
+
+    $data = [
+        'product_name' => $product_name,
+        'normal_values'=> $normal_values[$key],
+        'sub_product'  => $sub,
+        'unit'         => $units[$key]
+    ];
+    
     $result = $this->db->insert('product_master', $data);
+}
 
     if ($result) {
         $this->session->set_flashdata('success', 'Product added successfully.');
@@ -371,7 +382,7 @@ public function product_update()
        
         'product_name' => $this->input->post('product_name', TRUE),
         'sub_product' => $this->input->post('sub_product', TRUE),
-        'rate'   => $this->input->post('rate', TRUE),
+        'normal_values'   => $this->input->post('normal_values', TRUE),
         'unit'   => $this->input->post('unit', TRUE),
     ];
     if (empty($id)) {
@@ -420,19 +431,27 @@ public function product_update()
     }
     public function save_registration(){
         $data = $this->input->post();
+        $user_id = $this->input->post('user_id');
         $arr=[
             'username'=>$data['username'],
             'phone'=>$data['phone'],
             'email'=>$data['email'],
             'password'=>$data['password'],
             'role'=>$data['role'],
+            'created_at' => date('Y-m-d H:i:s'),
         ];
-        $result=$this->db->insert('users',$arr);
-        if($result){
+        if($user_id == "")
+        {
+            $this->db->insert('users', $arr);
             $this->session->set_flashdata('success', 'Registration successfully. Wait for admin activation');
-        }else{
-                $this->session->set_flashdata('error', 'Failed to Registration.');
         }
+        else
+        {
+            $this->db->where('id', $user_id);
+            $this->db->update('users', $arr);
+            $this->session->set_flashdata('success', 'Update successfully');
+        }
+      
         redirect('masters/new_registration');
     }
 

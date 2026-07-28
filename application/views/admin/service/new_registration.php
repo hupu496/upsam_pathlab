@@ -297,7 +297,28 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
+<?php
+if (!function_exists('getColor')) {
+    function getColor($text)
+    {
+        $colors = [
+            '#0d6efd', // Blue
+            '#198754', // Green
+            '#dc3545', // Red
+            '#ffc107', // Yellow
+            '#6f42c1', // Purple
+            '#20c997', // Teal
+            '#fd7e14', // Orange
+            '#6610f2', // Indigo
+            '#e83e8c', // Pink
+            '#6c757d'  // Gray
+        ];
 
+        $index = abs(crc32($text)) % count($colors);
+        return $colors[$index];
+    }
+}
+?>
 <div class="row">
     <div class="col-12">
         <!-- ==================== USER LIST ==================== -->
@@ -330,12 +351,12 @@
                                         <td><?php echo $i++; ?></td>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <div class="user-avatar me-2" style="background: <?php echo getColor($user['name']); ?>;">
+                                                <div class="user-avatar me-2" style="background: <?php echo getColor($user['username']); ?>;">
                                                     <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
                                                 </div>
                                                 <div>
                                                     <div class="fw-semibold"><?php echo $user['username']; ?></div>
-                                                    <!-- <small class="text-muted">ID: <?php echo $user['user_id'] ?? 'USR' . str_pad($user['id'], 4, '0', STR_PAD_LEFT); ?></small> -->
+                                                    
                                                 </div>
                                             </div>
                                         </td>
@@ -347,17 +368,39 @@
                                             </span>
                                         </td>
                                         <td>
+                                            <?php if($user['status']==1): ?>
                                             <span class="status-badge <?php echo $user['status'] ?? 'active'; ?>">
-                                                <?php echo ucfirst($user['status'] ?? 'Active'); ?>
+                                                Active
                                             </span>
+                                            <?php else: ?>
+                                                 <span class="status-badge <?php echo $user['status'] ?? 'active'; ?>">
+                                                Inactive
+                                            </span>
+                                             <?php endif; ?>
                                         </td>
                                         <td><?php echo date('d M Y', strtotime($user['created_at'] ?? date('Y-m-d'))); ?></td>
                                         <td class="text-center">
                                             <div class="btn-action-group">
-                                                <button class="btn-action edit" onclick="editUser(<?php echo $user['id']; ?>)" title="Edit">
+                                                <?php if($user['status']==1): ?>
+                                                <button class="btn-action edit"
+                                                        onclick="activates(<?php echo $user['id']; ?>)"
+                                                        title="Activate">
+                                                 <i class="fas fa-check-circle"></i>
+                                                </button>
+                                                 <?php else: ?>
+                                                     <button class="btn-action delete"
+                                                        onclick="activates(<?php echo $user['id']; ?>)"
+                                                        title="Deactivate">
+                                                  <i class="fas fa-unlock"></i>
+                                                </button>
+                                                <?php endif; ?>
+                                               <button class="btn-action edit"
+                                                    onclick="editUser(<?php echo $user['id']; ?>)">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <button class="btn-action delete" onclick="deleteUser(<?php echo $user['id']; ?>)" title="Delete">
+                                                <button class="btn-action delete"
+                                                        onclick="deleteUser(<?php echo $user['id']; ?>)"
+                                                        title="Delete">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
@@ -590,44 +633,59 @@ function showToast(message, type) {
 }
 
 // Edit User
-function editUser(id) {
+function editUser(id)
+{
     $.ajax({
-        url: '<?php echo base_url("admin/registration/get"); ?>/' + id,
-        type: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            if (data.status === 'success') {
-                var user = data.data;
-                $('#formTitle').text('Edit User - ' + user.name);
-                $('#submitBtnText').text('Update User');
-                $('#user_id').val(user.id);
-                $('#name').val(user.name);
-                $('#phone').val(user.phone);
-                $('#email').val(user.email);
-                $('#role').val(user.role);
-                $('#status').val(user.status || 'active');
-                $('#password').val('').prop('required', false);
-                showToast('User data loaded for editing', 'success');
-                
-                // Scroll to form
+        url: "<?php echo base_url('welcome/get/'); ?>" + id,
+        type: "GET",
+        dataType: "json",
+        success: function(res)
+        {
+            console.log(res);
+
+            if(res.status == "success")
+            {
+                var user = res.data;
+
+                // Hidden ID
+                $("#user_id").val(user.id);
+
+                // Fill form
+                $("#name").val(user.username);
+                $("#phone").val(user.phone);
+                $("#email").val(user.email);
+                $("#password").val(user.password); // or "" if you don't want to show password
+                $("#role").val(user.role);
+
+                // Change button text
+                $("#submitBtnText").text("Update User");
+
+                // If the form is inside a modal
+                $("#addUserModal").modal("show");
+
+                // If the form is on the same page instead of a modal,
+                // comment the above line and scroll to the form.
                 $('html, body').animate({
-                    scrollTop: $('#registrationForm').offset().top - 100
+                    scrollTop: $("#registrationForm").offset().top - 80
                 }, 300);
-            } else {
-                showToast('Error loading user data', 'error');
+            }
+            else
+            {
+                alert(res.message);
             }
         },
-        error: function() {
-            showToast('Error loading user data', 'error');
+        error:function(xhr)
+        {
+            console.log(xhr.responseText);
         }
     });
 }
-
 // Delete User
 function deleteUser(id) {
+
     if (confirm('Are you sure you want to delete this user?\nThis action cannot be undone.')) {
         $.ajax({
-            url: '<?php echo base_url("admin/registration/delete"); ?>/' + id,
+            url: '<?php echo base_url("welcome/delete"); ?>/' + id,
             type: 'DELETE',
             dataType: 'json',
             success: function(data) {
@@ -645,6 +703,39 @@ function deleteUser(id) {
             }
         });
     }
+}
+// activate
+function activates(id)
+{
+    if (!confirm("Are you sure you want to change the user status?")) {
+        return;
+    }
+
+    $.ajax({
+        url: "<?php echo base_url('welcome/activate/'); ?>" + id,
+        type: "POST",
+        dataType: "json",
+        success: function(res)
+        {
+            if(res.status == "success" || res.status == "unsuccess")
+            {
+                showToast(res.message, "success");
+
+                setTimeout(function(){
+                    location.reload();
+                },1000);
+            }
+            else
+            {
+                showToast("Something went wrong", "error");
+            }
+        },
+        error:function(xhr)
+        {
+            console.log(xhr.responseText);
+            showToast("Server Error", "error");
+        }
+    });
 }
 
 // Reset Form

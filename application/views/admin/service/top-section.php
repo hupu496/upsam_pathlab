@@ -469,12 +469,7 @@
                             <a class="nav-link" href="<?php echo base_url('admin/patient'); ?>">
                                 <i class="fas fa-user-plus"></i> Patient Registration
                             </a>
-                            <a class="nav-link" href="<?php echo base_url('admin/appointments'); ?>">
-                                <i class="fas fa-calendar-check"></i> Appointments
-                            </a>
-                            <a class="nav-link" href="<?php echo base_url('admin/test_requests'); ?>">
-                                <i class="fas fa-vial"></i> Test Requests
-                            </a>
+                           
                         </nav>
                     </div>
                 </div>
@@ -488,14 +483,9 @@
                     </a>
                     <div class="collapse" id="reportMenu">
                         <nav class="nav flex-column">
-                            <a class="nav-link" href="<?php echo base_url('admin/reports/daily'); ?>">
-                                <i class="fas fa-calendar-day"></i> Daily Report
-                            </a>
+                           
                             <a class="nav-link" href="<?php echo base_url('admin/reports/monthly'); ?>">
-                                <i class="fas fa-calendar-alt"></i> Monthly Report
-                            </a>
-                            <a class="nav-link" href="<?php echo base_url('admin/reports/yearly'); ?>">
-                                <i class="fas fa-calendar-year"></i> Yearly Report
+                                <i class="fas fa-calendar-alt"></i> Date Range Report
                             </a>
                             <a class="nav-link" href="<?php echo base_url('admin/reports/doctor_wise'); ?>">
                                 <i class="fas fa-user-md"></i> Doctor-wise Report
@@ -519,13 +509,6 @@
                             <a class="nav-link" href="<?php echo base_url('masters/new_registration'); ?>">
                                 <i class="fas fa-user-cog"></i> New Registration
                             </a>
-                            <a class="nav-link" href="<?php echo base_url('masters/changepassword'); ?>">
-                                <i class="fas fa-server"></i> Change Password
-                            </a>
-                            <a class="nav-link" href="<?php echo base_url('masters/changerole'); ?>">
-                                <i class="fas fa-database"></i>Change Role
-                            </a>
-                          
                         </nav>
                     </div>
                 </div>

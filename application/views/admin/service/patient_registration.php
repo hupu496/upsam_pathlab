@@ -326,6 +326,7 @@
             padding: 15px;
         }
     }
+    
 </style>
 
 <!-- Toast Container -->
@@ -407,67 +408,59 @@
                 
                 <!-- Table -->
                 <div class="table-responsive">
-                    <table id="patientTable" class="table patient-table">
+                   <table class="table table-bordered table-striped" id="patientTable">
                         <thead>
                             <tr>
                                 <th>#</th>
+                                <th>Report No</th>
                                 <th>Patient Name</th>
-                                <th>Address</th>
                                 <th>Age</th>
+                                <th>Gender</th>
                                 <th>Mobile</th>
-                                <th>Phone</th>
-                                <th>Email</th>
-                                <th>Status</th>
-                                <th class="text-center">Actions</th>
+                                <th>Test Name</th>
+                                <th>Report Date</th>
+                                <th width="150">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if(isset($patients) && !empty($patients)): ?>
-                                <?php $i = 1; foreach($patients as $patient): ?>
+
+                            <?php if(!empty($reports)){ $i=1; foreach($reports as $row){ ?>
                                     <tr>
-                                        <td><?php echo $i++; ?></td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="patient-avatar me-2" style="background: <?php echo getColor($patient['name']); ?>;">
-                                                    <?php echo strtoupper(substr($patient['name'], 0, 1)); ?>
-                                                </div>
-                                                <div>
-                                                    <div class="fw-semibold"><?php echo $patient['name']; ?></div>
-                                                    <small class="text-muted">ID: <?php echo $patient['patient_id'] ?? 'PAT' . str_pad($patient['id'], 4, '0', STR_PAD_LEFT); ?></small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <small><?php echo substr($patient['address'], 0, 30) . (strlen($patient['address']) > 30 ? '...' : ''); ?></small>
-                                        </td>
-                                        <td><?php echo $patient['age']; ?> yrs</td>
-                                        <td><?php echo $patient['mobile']; ?></td>
-                                        <td><?php echo $patient['phone'] ?? '-'; ?></td>
-                                        <td><?php echo $patient['email']; ?></td>
-                                        <td>
-                                            <span class="status-badge <?php echo $patient['status'] ?? 'pending'; ?>">
-                                                <?php echo ucfirst($patient['status'] ?? 'Pending'); ?>
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <div class="btn-action-group">
-                                                <button class="btn-action view" onclick="viewPatient(<?php echo $patient['id']; ?>)" title="View">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn-action edit" onclick="editPatient(<?php echo $patient['id']; ?>)" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn-action print" onclick="printPatient(<?php echo $patient['id']; ?>)" title="Print">
-                                                    <i class="fas fa-print"></i>
-                                                </button>
-                                                <button class="btn-action delete" onclick="deletePatient(<?php echo $patient['id']; ?>)" title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
+            <td><?= $i++; ?></td>
+            <td>RPT<?= str_pad($row['id'],5,'0',STR_PAD_LEFT); ?></td>
+            <td><?= $row['name']; ?></td>
+            <td><?= $row['age']; ?></td>
+            <td><?= $row['gender']; ?></td>
+            <td><?= $row['mobile']; ?></td>
+            <td><?= $row['test_name']; ?></td>
+            <td><?= date('d-m-Y',strtotime($row['report_date'])); ?></td>
+
+            <td class="text-center">
+
+                <a href="<?= base_url('admin/patient/report/'.$row['id']); ?>"
+                   class="btn btn-sm btn-info"
+                   title="View Report">
+                    <i class="fas fa-eye"></i>
+                </a>
+
+                <a href="<?= base_url('admin/patient/print/'.$row['id']); ?>"
+                   target="_blank"
+                   class="btn btn-sm btn-success"
+                   title="Print">
+                    <i class="fas fa-print"></i>
+                </a>
+
+               <a href="javascript:void(0);"
+                class="btn btn-sm btn-danger"
+                onclick="deleteReport(<?= $row['id']; ?>)"
+                title="Delete">
+                    <i class="fas fa-trash"></i>
+                </a>
+
+            </td>
+        </tr>
+                                <?php }}else{ ?>
+                           
                                 <tr>
                                     <td colspan="9">
                                         <div class="text-center py-5">
@@ -480,7 +473,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                            <?php endif; ?>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>
@@ -510,20 +503,20 @@
                             <i class="fas fa-user"></i> Personal Information
                         </div>
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-1">
                                 <label class="form-label">Patient Name <span class="required">*</span></label>
                                 <input type="text" class="form-control" id="name" name="name" 
                                        placeholder="Enter full name" required 
                                        oninput="validateField(this)">
                                 <div class="form-text">Enter the patient's full name</div>
                             </div>
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-3 mb-1">
                                 <label class="form-label">Age <span class="required">*</span></label>
                                 <input type="number" class="form-control" id="age" name="age" 
                                        placeholder="Age" min="0" max="150" required
                                        oninput="validateField(this)">
                             </div>
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-3 mb-1">
                                 <label class="form-label">Gender <span class="required">*</span></label>
                                 <select class="form-select" id="gender" name="gender" required>
                                     <option value="">Select</option>
@@ -537,11 +530,9 @@
                     
                     <!-- Contact Information -->
                     <div class="form-section">
-                        <div class="form-section-title">
-                            <i class="fas fa-phone"></i> Contact Information
-                        </div>
+                       
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-1">
                                 <label class="form-label">Mobile Number <span class="required">*</span></label>
                                 <input type="tel" class="form-control" id="mobile" name="mobile" 
                                        placeholder="10-digit mobile number" required
@@ -549,76 +540,49 @@
                                        oninput="validateField(this)">
                                 <div class="form-text">Enter 10-digit mobile number</div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" 
-                                       placeholder="Landline number" maxlength="15">
-                                <div class="form-text">Optional landline number</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Email Information -->
-                    <div class="form-section">
-                        <div class="form-section-title">
-                            <i class="fas fa-envelope"></i> Email Information
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Email Address <span class="required">*</span></label>
-                                <input type="email" class="form-control" id="email" name="email" 
-                                       placeholder="example@email.com" required
-                                       oninput="validateField(this)">
-                                <div class="form-text">Enter a valid email address</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Address Information -->
-                    <div class="form-section">
-                        <div class="form-section-title">
-                            <i class="fas fa-map-marker-alt"></i> Address Information
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Address <span class="required">*</span></label>
-                                <textarea class="form-control" id="address" name="address" 
-                                          rows="3" placeholder="Enter complete address" required
-                                          oninput="validateField(this)"></textarea>
-                                <div class="form-text">Include house number, street, city, state, and pincode</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Additional Information -->
-                    <div class="form-section">
-                        <div class="form-section-title">
-                            <i class="fas fa-info-circle"></i> Additional Information
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" id="status" name="status">
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                    <option value="pending" selected>Pending</option>
-                                    <option value="completed">Completed</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-1">
                                 <label class="form-label">Registration Date</label>
                                 <input type="date" class="form-control" id="registration_date" 
                                        name="registration_date" value="<?php echo date('Y-m-d'); ?>">
                             </div>
                         </div>
+                        <div class="row">
+                             <div class="col-md-6">
+                                <label for="" class="form-label">Select Doctor</label>
+                                <select class="form-control" id="doctor" name="doctor">
+                                    <option value="">Select Doctor</option>
+                                    <?php foreach($doctor as $row){ ?>
+
+                                    <option value="<?php echo $row['id']; ?>">
+                                        <?php echo $row['doctor_name']; ?>
+                                    </option>
+
+                                    <?php } ?>
+
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="" class="form-label">Select Test</label>
+                                <select class="form-control" id="test_name" name="test_name">
+                                    <option value="">Select Test</option>
+                                    <?php foreach($product_master as $row){ ?>
+
+                                    <option value="<?php echo $row['product_name']; ?>">
+                                        <?php echo $row['product_name']; ?>
+                                    </option>
+
+                                    <?php } ?>
+
+                                </select>
+                            </div>
+                        </div>
+                        <hr>
+                        <div id="sub_test_div"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i> Cancel
-                    </button>
-                    <button type="reset" class="btn btn-warning" onclick="resetModalForm()">
-                        <i class="fas fa-undo"></i> Reset
                     </button>
                     <button type="submit" class="btn btn-primary" id="submitBtn">
                         <i class="fas fa-save"></i> <span id="submitBtnText">Save Patient</span>
@@ -628,8 +592,66 @@
         </div>
     </div>
 </div>
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
+$(document).ready(function(){
+    $("#test_name").change(function(){
+        var product_name = $(this).val();
+        console.log(product_name);
+        $.ajax({
+            url:"<?php echo base_url('get-sub-test'); ?>",
+            type:"POST",
+            data:{
+                product_name:product_name
+            },
+            dataType:"json",
+            success:function(response){
+
+                var html='';
+                html+='<table class="table table-bordered">';
+                html+='<tr>';
+                html+='<th>Sub Test</th>';
+                html+='<th>Result</th>';
+                html+='<th>Normal Value</th>';
+                html+='<th>Unit</th>';
+                html+='</tr>';
+
+                $.each(response,function(i,row){
+
+                    html+='<tr>';
+
+                    html+='<td>';
+                    html+=row.sub_product;
+                    html+='<input type="hidden" name="sub_product_id[]" value="'+row.id+'">';
+                    html+='</td>';
+
+                    html+='<td>';
+                    html+='<input type="text" class="form-control" name="result_value[]">';
+                    html+='</td>';
+
+                    html+='<td>'+row.normal_values+'</td>';
+
+                    html+='<td>'+row.unit+'</td>';
+
+                    html+='</tr>';
+
+                });
+
+                html+='</table>';
+
+                $("#sub_test_div").html(html);
+
+            },
+
+            error:function(xhr){
+                console.log(xhr.responseText);
+            }
+
+        });
+
+    });
+
+});
 $(document).ready(function() {
     // Initialize DataTable
     var table = $('#patientTable').DataTable({
@@ -648,7 +670,7 @@ $(document).ready(function() {
             { targets: [8], orderable: false }
         ]
     });
-    
+                            
     // Custom Search
     $('#searchInput').on('keyup', function() {
         table.search(this.value).draw();
@@ -801,24 +823,32 @@ function viewPatient(id) {
 }
 
 // Delete Patient
-function deletePatient(id) {
-    if (confirm('Are you sure you want to delete this patient?\nThis action cannot be undone.')) {
+function deleteReport(id)
+{
+    if(confirm("Delete this report?"))
+    {
         $.ajax({
-            url: '<?php echo base_url("admin/patient/delete"); ?>/' + id,
-            type: 'DELETE',
-            dataType: 'json',
-            success: function(data) {
-                if (data.status === 'success') {
-                    showToast('Patient deleted successfully', 'success');
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    showToast('Error deleting patient', 'error');
+            url: "<?= base_url('admin/patient/delete/'); ?>" + id,
+            type: "POST",
+            dataType: "json",
+            success: function(res)
+            {
+                if(res.status == "success")
+                {
+                    alert(res.message);
+
+                    // Remove the row or reload
+                    location.reload();
+                }
+                else
+                {
+                    alert(res.message);
                 }
             },
-            error: function() {
-                showToast('Error deleting patient', 'error');
+            error: function(xhr)
+            {
+                console.log(xhr.responseText);
+                alert("Something went wrong.");
             }
         });
     }

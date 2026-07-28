@@ -59,4 +59,77 @@ public function registration_form(){
         $this->session->sess_destroy();
         redirect('welcome/index');
     }
+    public function get($id)
+{
+    $user = $this->db->where('id',$id)
+                     ->get('users')
+                     ->row_array();
+    if($user)
+    {
+        echo json_encode([
+            'status'=>'success',
+            'data'=>$user
+        ]);
+    }
+    else
+    {
+        echo json_encode([
+            'status'=>'error',
+            'message'=>'User not found'
+        ]);
+    }
+}
+public function update_user()
+{
+    $id = $this->input->post('user_id');
+    
+    $data = array(
+        'username' => $this->input->post('username'),
+        'phone'    => $this->input->post('phone'),
+        'email'    => $this->input->post('email'),
+        'role'     => $this->input->post('role')
+    );
+
+    if($this->input->post('password') != '')
+    {
+        $data['password'] = $this->input->post('password');
+    }
+        $this->db->where('id',$id);
+        $this->db->update('users',$data);
+
+        echo json_encode([
+            'status'=>'success',
+            'message'=>'User updated successfully'
+        ]);
+    
+}
+public function delete($id)
+{
+    $this->db->where('id',$id);
+    $this->db->delete('users');
+
+    echo json_encode([
+        'status'=>'success',
+        'message'=>'User deleted successfully'
+    ]);
+}
+public function activate($id)
+{
+    $result = $this->db->get_where('users',array('id'=>$id))->row_array();
+    if($result['status'] == 1){
+      $this->db->where('id',$id);
+      $this->db->update('users',array('status'=>0));
+       echo json_encode([
+        'status'=>'unsuccess',
+        'message'=>'User Deactivate successfully'
+    ]);
+    }else{
+        $this->db->where('id',$id);
+        $this->db->update('users',array('status'=>1));
+        echo json_encode([
+        'status'=>'success',
+        'message'=>'User Activate successfully'
+    ]);
+    }
+}
 }

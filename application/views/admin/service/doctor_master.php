@@ -107,7 +107,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>Center Name <span class="text-danger">*</span></label>
+                                <label>Doctor Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="edit_doctor_name" name="doctor_name" required>
                             </div>
                         </div>
@@ -117,7 +117,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>Address <span class="text-danger">*</span></label>
+                                <label>Qualifications <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="edit_qualification" name="qualification" rows="2" required></textarea>
                             </div>
                         </div>
@@ -143,7 +143,7 @@
                     
                     <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary" id="updateLabBtn">Update Lab</button>
+                <button type="submit" class="btn btn-primary" id="updateLabBtn">Update Doctor</button>
             </div>
                 </form>
             </div>

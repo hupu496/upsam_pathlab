@@ -547,7 +547,7 @@
                 <div>
                     <i class="fas fa-flask"></i> Recent Labs
                 </div>
-                <a href="<?php echo base_url('admin/lab_master'); ?>" class="btn btn-sm btn-outline-primary">
+                <a href="<?php echo base_url('masters/lab'); ?>" class="btn btn-sm btn-outline-primary">
                     View All <i class="fas fa-arrow-right ms-1"></i>
                 </a>
             </div>
@@ -576,7 +576,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td><?php echo $labs['code']; ?></td>
+                                        <td><?php echo $labs['lab_code']; ?></td>
                                         <td><?php echo $labs['contact']; ?></td>
                                     </tr>
                                 <?php endforeach; ?>
