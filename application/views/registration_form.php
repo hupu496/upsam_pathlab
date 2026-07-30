@@ -293,20 +293,7 @@
     </div>
 </div>
 
-<!-- Alert Messages -->
-<?php if($this->session->flashdata('success')): ?>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle me-2"></i> <?php echo $this->session->flashdata('success'); ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-<?php endif; ?>
 
-<?php if($this->session->flashdata('error')): ?>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-circle me-2"></i> <?php echo $this->session->flashdata('error'); ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-<?php endif; ?>
 
 <div class="row">
     <div class="col-md-12 col-12">
@@ -416,7 +403,13 @@
         </div>
     </div>
 </div>
-
+<!-- alert -->
+    <div class="mb-3">
+                <p class="text-muted small text-uppercase fw-bold mb-2"><i class="fas fa-wand-sparkles me-1"></i> SweetAlert2 · popup style</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-outline-success rounded-pill" id="swalSuccessBtn"><i class="fas fa-check-circle me-1"></i> Success popup</button>
+                    <button class="btn btn-outline-danger rounded-pill" id="swalErrorBtn"><i class="fas fa-times-circle me-1"></i> Error popup</button>
+                </div>
 <script>
 $(document).ready(function() {
     // Initialize DataTable

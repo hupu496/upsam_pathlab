@@ -424,9 +424,10 @@
                         <i class="fas fa-tachometer-alt"></i> Dashboard
                     </a>
                 </div>
-                
+                 <?php if($this->session->userdata('role')=='admin') {  ?>
                 <!-- Master Menu with Dropdown -->
                 <div class="nav-item">
+                    
                     <a class="nav-link <?php echo ($this->uri->segment(2) == 'master' || $this->uri->segment(2) == 'lab_master' || $this->uri->segment(2) == 'center_master' || $this->uri->segment(2) == 'doctor_master' || $this->uri->segment(2) == 'product_master') ? 'active' : ''; ?>" 
                        data-bs-toggle="collapse" href="#masterMenu" role="button" 
                        aria-expanded="<?php echo ($this->uri->segment(2) == 'master' || $this->uri->segment(2) == 'lab_master' || $this->uri->segment(2) == 'center_master' || $this->uri->segment(2) == 'doctor_master' || $this->uri->segment(2) == 'product_master') ? 'true' : 'false'; ?>" 
@@ -449,14 +450,19 @@
                                href="<?php echo base_url('masters/doctor'); ?>">
                                 <i class="fas fa-user-md"></i> Doctor Master
                             </a>
+                             <a class="nav-link <?php echo ($this->uri->segment(2) == 'product_master') ? 'active' : ''; ?>" 
+                               href="<?php echo base_url('masters/main_test'); ?>">
+                                <i class="fas fa-box"></i>Test Master
+                            </a>
+
                             <a class="nav-link <?php echo ($this->uri->segment(2) == 'product_master') ? 'active' : ''; ?>" 
                                href="<?php echo base_url('masters/test'); ?>">
-                                <i class="fas fa-box"></i> Test Master
+                                <i class="fas fa-box"></i> Sub Test Master
                             </a>
                         </nav>
                     </div>
                 </div>
-                
+              
                 <!-- Transactions Menu with Dropdown -->
                 <div class="nav-item">
                     <a class="nav-link" data-bs-toggle="collapse" href="#transactionMenu" role="button" 
@@ -522,6 +528,52 @@
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </div>
+                  <?php  }elseif ($this->session->userdata('role')=='user') {  ?>
+                   <div class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#transactionMenu" role="button" 
+                       aria-expanded="false" aria-controls="transactionMenu">
+                        <i class="fas fa-exchange-alt"></i> Transactions
+                        <span class="arrow"><i class="fas fa-chevron-down"></i></span>
+                    </a>
+                    <div class="collapse" id="transactionMenu">
+                        <nav class="nav flex-column">
+                            <a class="nav-link" href="<?php echo base_url('admin/patient'); ?>">
+                                <i class="fas fa-user-plus"></i> Patient Registration
+                            </a>
+                           
+                        </nav>
+                    </div>
+                </div>
+                 <div class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#reportMenu" role="button" 
+                       aria-expanded="false" aria-controls="reportMenu">
+                        <i class="fas fa-chart-bar"></i> Reports
+                        <span class="arrow"><i class="fas fa-chevron-down"></i></span>
+                    </a>
+                    <div class="collapse" id="reportMenu">
+                        <nav class="nav flex-column">
+                           
+                            <a class="nav-link" href="<?php echo base_url('admin/reports/monthly'); ?>">
+                                <i class="fas fa-calendar-alt"></i> Date Range Report
+                            </a>
+                            <a class="nav-link" href="<?php echo base_url('admin/reports/doctor_wise'); ?>">
+                                <i class="fas fa-user-md"></i> Doctor-wise Report
+                            </a>
+                            <a class="nav-link" href="<?php echo base_url('admin/reports/test_wise'); ?>">
+                                <i class="fas fa-flask"></i> Test-wise Report
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+                 <div class="nav-divider"></div>
+                
+                <!-- Logout -->
+                <div class="nav-item">
+                    <a class="nav-link" href="<?php echo base_url('welcome/logout'); ?>">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+                 <?php  } ?>
             </nav>
         </div>
         
@@ -548,7 +600,7 @@
                 </div>
                 <div class="user-info">
                     <span class="role-badge">
-                        <i class="fas fa-shield-alt"></i> Admin
+                        <i class="fas fa-shield-alt"></i> <?php echo $this->session->userdata('role'); ?>
                     </span>
                     <div class="avatar">
                         <?php 

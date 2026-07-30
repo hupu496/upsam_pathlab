@@ -21,21 +21,22 @@ public function registration_form(){
     $password = $this->input->post('password');
 
     $result = $this->db->get_where('users', [
-        'email' => $email
+        'email' => $email,'status'=>1
     ])->row_array();
-
+    
     if ($result && $result['password'] == $password) {
 
         // Set session if needed
         $this->session->set_userdata([
             'userid'   => $result['id'],
-            'username' => $result['username']
+            'username' => $result['username'],
+            'role'     => $result['role']
         ]);
-
+         $this->session->set_flashdata('success', 'activate successfully.');
         redirect('welcome/dashboard');
 
     } else {
-
+        $this->session->set_flashdata('error', 'Not active by admin');
         redirect('welcome/index');
     }
 }

@@ -26,7 +26,7 @@
                              foreach ($product_master as $key => $value) {  $i++; ?>
                                <tr>
                                 <td><?php echo $i; ?></td>
-                                <td><?php echo $value['product_name']; ?></td>
+                                <td><?php echo $value['name']; ?></td>
                                 <td><?php echo $value['sub_product']; ?></td>
                                 <td><?php echo $value['normal_values']; ?></td>
                                 <td><?php echo $value['unit']; ?></td>
@@ -66,7 +66,18 @@
                         <!-- Test Name -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Test Name *</label>
-                            <input type="text" class="form-control" name="product_name" required>
+                            <select name="product_id" id="product_id" class="form-control">
+                                <option value="">--Select Test--</option>
+                            <?php foreach ($maintest as $key => $value) { ?>
+                                  <option value="<?php echo $value['id']; ?>"><?php echo $value['name']; ?></option>
+                             <?php   }  ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+    Remaining Sub Tests :
+    <strong id="remainingCount">0</strong>
+</div>
                         </div>
                     </div>
 
@@ -103,7 +114,7 @@
 
                             <div class="col-md-2">
                                 <button type="button"
-                                        class="btn btn-success addRow">
+                                        class="btn btn-success addRow" id="addRowBtn">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
@@ -119,7 +130,7 @@
                         Cancel
                     </button>
 
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="saveBtn">
                         Save Test
                     </button>
                 </div>
@@ -149,7 +160,7 @@
                         <!-- Test Name -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Test Name *</label>
-                            <input type="text" class="form-control" id="edit_product_name" name="product_name" required>
+                            <input type="text" class="form-control" id="edit_product_id" name="product_id" required>
                         </div>
                         
                     </div>
@@ -217,100 +228,115 @@
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 
 <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-<!-- <script>
-$(document).ready(function(){
 
-    // Add new row
-    $(document).on('click','.addRow',function(){
+<script>
+    var maxRows = 1;
 
-        var row = `
-        <div class="row sub-test-row mb-2">
+$("#product_id").change(function(){
 
-            <div class="col-md-3">
-                <input type="text"
-                       class="form-control"
-                       name="sub_product[]"
-                       placeholder="Sub Test"
-                       required>
-            </div>
+    var product_id = $(this).val();
 
-            <div class="col-md-3">
-                <input type="text"
-                       class="form-control"
-                       name="normal_values[]"
-                       placeholder="Values"
-                       required>
-            </div>
-             <div class="col-md-3">
-                <input type="text"
-                       class="form-control"
-                       name="unit[]"
-                       placeholder="Measurement"
-                       required>
-            </div>
+    if(product_id==""){
+        $("#remainingCount").text(0);
+        maxRows = 1;
+        return;
+    }
 
-            <div class="col-md-2">
-                <button type="button" class="btn btn-danger removeRow">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
+    $.ajax({
+        url:"<?= base_url('masters/get_remaining_subtest'); ?>",
+        type:"POST",
+        data:{product_id:product_id},
+        dataType:"json",
+        success:function(res){
 
-        </div>`;
+    $("#remainingCount").text(res.remaining);
 
-        $("#subTestContainers").append(row);
+    maxRows = parseInt(res.remaining);
 
-    });
+    if(res.remaining <= 0){
 
-    // Remove row
-    $(document).on('click','.removeRow',function(){
-        $(this).closest('.sub-test-row').remove();
+        alert("Maximum sub tests already added.");
+
+        // Disable all inputs
+        $("#subTestContainer")
+            .find("input, select, textarea")
+            .prop("disabled", true);
+
+        // Disable + button
+        $("#addRowBtn").prop("disabled", true);
+
+        // Disable Save button
+        $("#saveBtn").prop("disabled", true);
+
+    }else{
+
+        // Enable all inputs
+        $("#subTestContainer")
+            .find("input, select, textarea")
+            .prop("disabled", false);
+
+        // Enable + button
+        $("#addRowBtn").prop("disabled", false);
+
+        // Enable Save button
+        $("#saveBtn").prop("disabled", false);
+    }
+
+}
     });
 
 });
-</script> -->
-<script>
 $(document).ready(function(){
 
-    // Add new row
-    $(document).on('click','.addRow',function(){
+$(document).on('click','.addRow',function(){
 
-        var row = `
-        <div class="row sub-test-row mb-2">
+    var currentRows = $(".sub-test-row").length;
 
-            <div class="col-md-3">
-                <input type="text"
-                       class="form-control"
-                       name="sub_product[]"
-                       placeholder="Sub Test"
-                       required>
-            </div>
+    if((currentRows - 1) >= maxRows){
 
-            <div class="col-md-3">
-                <input type="text"
-                       class="form-control"
-                       name="normal_values[]"
-                       placeholder="Values"
-                       required>
-            </div>
-             <div class="col-md-3">
-                <input type="text"
-                       class="form-control"
-                       name="unit[]"
-                       placeholder="Measurement"
-                       required>
-            </div>
+        alert("Only " + maxRows + " sub tests are allowed.");
 
-            <div class="col-md-2">
-                <button type="button" class="btn btn-danger removeRow">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
+        return false;
+    }
 
-        </div>`;
+    var row = `
+    <div class="row sub-test-row mb-2">
 
-        $("#subTestContainer").append(row);
+        <div class="col-md-3">
+            <input type="text"
+                   class="form-control"
+                   name="sub_product[]"
+                   placeholder="Sub Test"
+                   required>
+        </div>
 
-    });
+        <div class="col-md-3">
+            <input type="text"
+                   class="form-control"
+                   name="normal_values[]"
+                   placeholder="Values"
+                   required>
+        </div>
+
+        <div class="col-md-3">
+            <input type="text"
+                   class="form-control"
+                   name="unit[]"
+                   placeholder="Measurement"
+                   required>
+        </div>
+
+        <div class="col-md-2">
+            <button type="button" class="btn btn-danger removeRow">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+
+    </div>`;
+
+    $("#subTestContainer").append(row);
+
+});
 
     // Remove row
     $(document).on('click','.removeRow',function(){

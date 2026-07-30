@@ -499,9 +499,8 @@ if (!function_exists('getColor')) {
                                 <select class="form-select" id="role" name="role" required>
                                     <option value="">Select Role</option>
                                     <option value="admin">Administrator</option>
-                                    <option value="doctor">Doctor</option>
-                                    <option value="receptionist">Receptionist</option>
-                                    <option value="lab">Lab Technician</option>
+                                    <option value="user">Users</option>
+
                                 </select>
                             </div>
                             <!-- <div class="col-md-6 mb-3">

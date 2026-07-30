@@ -322,22 +322,27 @@ public function doctor_update()
         if(empty($this->session->userdata('userid'))) {
             redirect('welcome/index');
         }
-           $data['product_master']= $this->db->get_where('product_master',array('status'=>1))->result_array();
-
+           $data['maintest'] = $this->db->get_where('test_master',array('status'=>1))->result_array();
+           $data['product_master']= $this->db->select('product_master.*,test_master.id,test_master.name,test_master.quantity')
+                                    ->from('product_master')
+                                    ->join('test_master','test_master.id=product_master.product_id')
+                                    ->where('product_master.status','1')->get()->result_array();
+           
+            
            $this->load->view('admin/service/top-section',$data);
            $this->load->view('admin/service/product_master', $data);
            $this->load->view('admin/service/footer',$data);
     }
 public function add_product()
 {
-$product_name = $this->input->post('product_name');
+$product_id = $this->input->post('product_id');
 $sub_products = $this->input->post('sub_product');
 $units = $this->input->post('unit');
 $normal_values = $this->input->post('normal_values');
 foreach ($sub_products as $key => $sub) {
 
     $data = [
-        'product_name' => $product_name,
+        'product_id' => $product_id,
         'normal_values'=> $normal_values[$key],
         'sub_product'  => $sub,
         'unit'         => $units[$key]
@@ -454,6 +459,124 @@ public function product_update()
       
         redirect('masters/new_registration');
     }
+    // main test part
+    public function main_test() {
+         if(empty($this->session->userdata('userid'))) {
+            redirect('welcome/index');
+        }
+        $data['main_test']=$this->db->get_where('test_master',array('status'=>1))->result_array();
+           $this->load->view('admin/service/top-section',$data);
+           $this->load->view('admin/service/maintest', $data);
+           $this->load->view('admin/service/footer',$data);
+    }
+    public function maintest_add()
+{
+    $data = $this->input->post();
+    $result = $this->db->insert('test_master', $data);
+
+    if ($result) {
+        $this->session->set_flashdata('success', 'Test added successfully.');
+    } else {
+        $this->session->set_flashdata('error', 'Failed to add Test.');
+    }
+
+    redirect('masters/main_test');
+}
+// Get Lab Data for Edit
+public function get_test_data() {
+    $id = $this->input->post('id');
+    
+    if (empty($id)) {
+        echo json_encode(['status' => 'error', 'message' => 'ID is required']);
+        return;
+    }
+    
+    $this->db->where('id', $id);
+    $query = $this->db->get('test_master'); // Adjust table name as needed
+    
+    if ($query->num_rows() > 0) {
+        $data = $query->row_array();
+        echo json_encode(['status' => 'success', 'data' => $data]);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Test not found']);
+    }
+}
+
+// Update Lab Data
+public function maintest_update()
+{
+    $id = $this->input->post('id');
+
+    $data = [
+        'name'    => $this->input->post('name', TRUE),
+        'quantity' => $this->input->post('quantity', TRUE),
+        
+    ];
+
+    if (empty($id)) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Invalid ID'
+        ]);
+        return;
+    }
+
+    $this->db->where('id', $id);
+
+    if ($this->db->update('test_master', $data)) {
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Test updated successfully'
+        ]);
+    } else {
+        echo json_encode([
+            'status' => 'error',
+            'message' => $this->db->error()['message']
+        ]);
+    }
+}
+    public function maintest_delete(){
+        $id = $this->uri->segment('3');
+       
+         $this->db->where('id',$id);
+
+    if($this->db->delete('test_master')){
+        $this->session->set_flashdata('success', 'Test Delete successfully.');
+        redirect('masters/main_test');
+    }else{
+        $this->session->set_flashdata('error', 'Failed to delete Test.');
+    redirect('masters/main_test');
+    }
+    }
+    public function get_remaining_subtest()
+{
+    $product_id = $this->input->post('product_id');
+
+    // Get quantity from test_master
+    $test = $this->db->select('quantity')
+                     ->from('test_master')
+                     ->where('id', $product_id)
+                     ->get()
+                     ->row();
+
+    $quantity = ($test) ? $test->quantity : 0;
+
+    // Count existing sub tests
+    $used = $this->db->where('product_id', $product_id)
+                     ->count_all_results('product_master');
+
+    $remaining = $quantity - $used;
+
+    if($remaining < 0){
+        $remaining = 0;
+    }
+
+    echo json_encode([
+        'quantity'  => $quantity,
+        'used'      => $used,
+        'remaining' => $remaining
+    ]);
+}
 
 
 }
