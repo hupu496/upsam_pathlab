@@ -13,10 +13,12 @@ class Patient extends CI_Controller {
     // Product dropdown
     $data['doctor'] = $this->db->get_where('doctor_master',array('status'=>1))->result_array();
     $data['product_master'] = $this->db
-        ->select('id, product_name, sub_product, normal_values, rate, unit, status')
-        ->where('status', 1)
-        ->group_by('product_name')
-        ->get('product_master')
+        ->select('product_master.*,test_master.id as test_id,test_master.name,test_master.quantity')
+        ->from('product_master')
+        ->join('test_master','product_master.product_id = test_master.id')
+        ->where('product_master.status', 1)
+        ->group_by('product_id')
+        ->get()
         ->result_array();
 
     // Pathology Report List
@@ -24,25 +26,19 @@ class Patient extends CI_Controller {
         ->select('
            pathology_report.id,
             pathology_report.report_date,
-            pathology_report.test_name,
+            pathology_report.test_id,
+            patient_master.id,
             patient_master.name,
             patient_master.age,
             patient_master.gender,
             patient_master.mobile,
-        ')
+            test_master.id,test_master.name,test_master.quantity,')
         ->from('patient_master')
         ->join('pathology_report','pathology_report.patient_id = patient_master.id','left')
+        ->join('test_master','pathology_report.test_id = test_master.id')
         ->order_by('pathology_report.id','DESC')
         ->get()
         ->result_array();
-        // ->from('pathology_report_details')
-        // ->join('pathology_report', 'pathology_report.id = pathology_report_details.report_id', 'left')
-        // ->join('patient_master', 'patient_master.id = pathology_report.patient_id', 'left')
-        // ->join('product_master', 'product_master.id = pathology_report_details.product_id', 'left')
-        // ->order_by('pathology_report.id', 'DESC')
-        // ->get()
-        // ->result_array();
-
         $this->load->view('admin/service/top-section', $data);
         $this->load->view('admin/service/patient_registration', $data);
         $this->load->view('admin/service/footer', $data);
@@ -64,20 +60,6 @@ public function get_sub_test()
 public function save()
 {
     $this->db->trans_start();
-
-    // Save Patient
-    $patient = array(
-        'name'              => $this->input->post('name'),
-        'age'               => $this->input->post('age'),
-        'gender'            => $this->input->post('gender'),
-        'mobile'            => $this->input->post('mobile'),
-        'doctor'            => $this->input->post('doctor'),
-        'registration_date' => $this->input->post('registration_date')
-    );
-
-    $this->db->insert('patient_master', $patient);
-    $patient_id = $this->db->insert_id();
-
     // Save Report Header
     $report = array(
         'patient_id'  => $patient_id,
@@ -231,5 +213,94 @@ public function report($id)
         $patients = $this->Patient_model->get_all();
         // Export logic here
     }
+    public function patient_registration(){
+        $data['doctor'] = $this->db->get_where('doctor_master',array('status'=>1))->result_array();
+        $data['patient'] = $this->db->get_where('patient_master',array('status'=>1))->result_array();
+        $this->load->view('admin/service/top-section', $data);
+        $this->load->view('admin/service/patient_form', $data);
+        $this->load->view('admin/service/footer', $data);
+    }
+   public function patient_save()
+{
+    $patient_id = $this->input->post('patient_id');
+
+    $patient = array(
+        'name'              => $this->input->post('name'),
+        'age'               => $this->input->post('age'),
+        'gender'            => $this->input->post('gender'),
+        'mobile'            => $this->input->post('mobile'),
+        'doctor'            => $this->input->post('doctor'),
+        'registration_date' => $this->input->post('registration_date'),
+        'address'           => $this->input->post('address')
+    );
+
+    if (!empty($patient_id)) {
+
+        // Update existing patient
+        $this->db->where('id', $patient_id);
+        $result = $this->db->update('patient_master', $patient);
+        if ($result) {
+            $this->session->set_flashdata('success', 'Patient updated successfully.');
+        } else {
+            $this->session->set_flashdata('error', 'Failed to update patient.');
+        }
+
+    } else {
+
+        // Insert new patient
+        $result = $this->db->insert('patient_master', $patient);
+
+        if ($result) {
+            $this->session->set_flashdata('success', 'Patient registered successfully.');
+        } else {
+            $this->session->set_flashdata('error', 'Failed to register patient.');
+        }
+    }
+
+    redirect('admin/patient/patient_registration');
+}
+public function patient_delete($id){
+         
+           $this->db->where('id',$id);
+           $result =  $this->db->delete('patient_master');
+           
+           if($result){
+            echo json_encode([
+                'status'=>'success',
+                'message'=>'deleted successfully.'
+            ]);
+            }else{
+                echo json_encode([
+                    'status'=>'error',
+                    'message'=>'deleted successfully.'
+                ]);
+            }  
+           
+        }
+public function get_patient($id)
+{
+    // $patient = $this->db->get_where('patient_master', ['id' => $id])->row_array();
+    $patient = $this->db->select('patient_master.*, doctor_master.id as doctorid,doctor_master.doctor_name,doctor_master.doctor_code')
+            ->from('patient_master')
+            ->join('doctor_master','patient_master.doctor=doctor_master.id')
+            ->where('patient_master.id',$id)
+            ->get()
+            ->row_array();
+
+    if($patient){
+
+        echo json_encode([
+            'status' => 'success',
+            'data' => $patient
+        ]);
+
+    }else{
+
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Patient not found'
+        ]);
+    }
+}
 }
 ?>

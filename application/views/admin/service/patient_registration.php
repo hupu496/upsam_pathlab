@@ -489,7 +489,7 @@
             <div class="modal-header">
                 <h5 class="modal-title" id="patientModalLabel">
                     <i class="fas fa-user-plus"></i> 
-                    <span id="modalFormTitle">Patient Registration</span>
+                    <span id="modalFormTitle">Create Test</span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -497,49 +497,12 @@
                 <div class="modal-body">
                     <input type="hidden" id="patient_id" name="patient_id" value="">
                     
-                    <!-- Personal Information -->
-                    <div class="form-section">
-                        <div class="form-section-title">
-                            <i class="fas fa-user"></i> Personal Information
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-1">
-                                <label class="form-label">Patient Name <span class="required">*</span></label>
-                                <input type="text" class="form-control" id="name" name="name" 
-                                       placeholder="Enter full name" required 
-                                       oninput="validateField(this)">
-                                <div class="form-text">Enter the patient's full name</div>
-                            </div>
-                            <div class="col-md-3 mb-1">
-                                <label class="form-label">Age <span class="required">*</span></label>
-                                <input type="number" class="form-control" id="age" name="age" 
-                                       placeholder="Age" min="0" max="150" required
-                                       oninput="validateField(this)">
-                            </div>
-                            <div class="col-md-3 mb-1">
-                                <label class="form-label">Gender <span class="required">*</span></label>
-                                <select class="form-select" id="gender" name="gender" required>
-                                    <option value="">Select</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                   
                     
                     <!-- Contact Information -->
                     <div class="form-section">
                        
                         <div class="row">
-                            <div class="col-md-6 mb-1">
-                                <label class="form-label">Mobile Number <span class="required">*</span></label>
-                                <input type="tel" class="form-control" id="mobile" name="mobile" 
-                                       placeholder="10-digit mobile number" required
-                                       pattern="[0-9]{10}" maxlength="10"
-                                       oninput="validateField(this)">
-                                <div class="form-text">Enter 10-digit mobile number</div>
-                            </div>
                             <div class="col-md-6 mb-1">
                                 <label class="form-label">Registration Date</label>
                                 <input type="date" class="form-control" id="registration_date" 
@@ -548,9 +511,9 @@
                         </div>
                         <div class="row">
                              <div class="col-md-6">
-                                <label for="" class="form-label">Select Doctor</label>
+                                <label for="" class="form-label">Select Patient</label>
                                 <select class="form-control" id="doctor" name="doctor">
-                                    <option value="">Select Doctor</option>
+                                    <option value="">Select Patient</option>
                                     <?php foreach($doctor as $row){ ?>
 
                                     <option value="<?php echo $row['id']; ?>">

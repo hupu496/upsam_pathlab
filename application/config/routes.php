@@ -39,6 +39,7 @@ $route['admin/patient/delete/(:num)'] = 'admin/patient/delete/$1';
 $route['admin/patient/view/(:num)'] = 'admin/patient/view/$1';
 $route['admin/patient/get/(:num)'] = 'admin/patient/get/$1';
 $route['admin/patient/print/(:num)'] = 'admin/patient/print/$1';
+$route['admin/patient/patient_save'] = 'admin/patient/patient_save';
 $route['admin/patient/export'] = 'admin/patient/export';
 $route['admin/patient/search'] = 'admin/patient/search';
 $route['admin/patient/filter'] = 'admin/patient/filter';
