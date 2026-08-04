@@ -11,7 +11,7 @@ class Patient extends CI_Controller {
    public function index()
 {
     // Product dropdown
-    $data['doctor'] = $this->db->get_where('doctor_master',array('status'=>1))->result_array();
+   
     $data['product_master'] = $this->db
         ->select('product_master.*,test_master.id as test_id,test_master.name,test_master.quantity')
         ->from('product_master')
@@ -20,6 +20,8 @@ class Patient extends CI_Controller {
         ->group_by('product_id')
         ->get()
         ->result_array();
+        
+    $data['patient_list'] = $this->db->get_where('patient_master',array('report_status'=>0))->result_array();
 
     // Pathology Report List
     $data['reports'] = $this->db
@@ -27,18 +29,19 @@ class Patient extends CI_Controller {
            pathology_report.id,
             pathology_report.report_date,
             pathology_report.test_id,
-            patient_master.id,
+            patient_master.id as patientid,
             patient_master.name,
             patient_master.age,
             patient_master.gender,
             patient_master.mobile,
-            test_master.id,test_master.name,test_master.quantity,')
+            test_master.id as testid,test_master.name as test_name,test_master.quantity,')
         ->from('patient_master')
         ->join('pathology_report','pathology_report.patient_id = patient_master.id','left')
         ->join('test_master','pathology_report.test_id = test_master.id')
         ->order_by('pathology_report.id','DESC')
         ->get()
         ->result_array();
+      
         $this->load->view('admin/service/top-section', $data);
         $this->load->view('admin/service/patient_registration', $data);
         $this->load->view('admin/service/footer', $data);
@@ -46,11 +49,11 @@ class Patient extends CI_Controller {
     
 public function get_sub_test()
 {
-    $product_name = $this->input->post('product_name');
+    $product_id = $this->input->post('product_id');
    
 
     $data = $this->db
-        ->where('product_name',$product_name)
+        ->where('product_id',$product_id)
         ->where('status',1)
         ->get('product_master')
         ->result_array();
@@ -58,12 +61,12 @@ public function get_sub_test()
     echo json_encode($data);
 }
 public function save()
-{
+{   
+    $patient_id = $this->input->post('patient_id');
     $this->db->trans_start();
-    // Save Report Header
     $report = array(
         'patient_id'  => $patient_id,
-        'test_name'   => $this->input->post('test_name'),
+        'test_id'   => $this->input->post('test_id'),
         'report_date' => date('Y-m-d')
     );
 
@@ -119,14 +122,15 @@ if (!empty($product_ids)) {
 public function report($id)
 {
     $data['patient']=$this->db
-    ->select('patient_master.*,pathology_report.test_name,pathology_report.report_date,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
+    ->select('patient_master.*,test_master.id as testid, test_master.name as test_name,test_master.quantity,pathology_report.test_id,pathology_report.patient_id,pathology_report.report_date,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
     ->from('pathology_report')
     ->join('patient_master','patient_master.id=pathology_report.patient_id')
     ->join('doctor_master','doctor_master.id = patient_master.doctor')
+    ->join('test_master','pathology_report.test_id=test_master.id')
     ->where('pathology_report.id',$id)
     ->get()
     ->row_array();
-
+   
     $data['details']=$this->db
     ->where('report_id',$id)
     ->get('pathology_report_details')
@@ -180,27 +184,24 @@ public function report($id)
     
    public function print($id)
 {
-    $data['patient'] = $this->db
-        ->select('
-            patient_master.*,patient_master.id as patientid,
-            pathology_report.id as report_id,
-            pathology_report.test_name,
-            pathology_report.report_date,doctor_master.id as doctorid,doctor_master.doctor_name
-        ')
-        ->from('pathology_report')
-        ->join('patient_master','patient_master.id=pathology_report.patient_id')
-        ->join('doctor_master','patient_master.doctor=doctor_master.id')
-        ->where('pathology_report.id',$id)
-        ->get()
-        ->row_array();
+$data['patient']=$this->db
+    ->select('patient_master.*,test_master.id as testid, test_master.name as test_name,test_master.quantity,pathology_report.test_id,pathology_report.patient_id,pathology_report.report_date,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
+    ->from('pathology_report')
+    ->join('patient_master','patient_master.id=pathology_report.patient_id')
+    ->join('doctor_master','doctor_master.id = patient_master.doctor')
+    ->join('test_master','pathology_report.test_id=test_master.id')
+    ->where('pathology_report.id',$id)
+    ->get()
+    ->row_array();
         $data['details'] = $this->db
         ->select('
             pathology_report_details.*,
-            product_master.product_name,
-            product_master.sub_product
+            product_master.product_id,
+            product_master.sub_product,test_master.id as testid, test_master.name,test_master.quantity
         ')
         ->from('pathology_report_details')
         ->join('product_master','product_master.id=pathology_report_details.product_id')
+        ->join('test_master','product_master.product_id = test_master.id')
         ->where('pathology_report_details.report_id',$id)
         ->order_by('pathology_report_details.id','ASC')
         ->get()
@@ -215,7 +216,12 @@ public function report($id)
     }
     public function patient_registration(){
         $data['doctor'] = $this->db->get_where('doctor_master',array('status'=>1))->result_array();
-        $data['patient'] = $this->db->get_where('patient_master',array('status'=>1))->result_array();
+        $data['patient'] = $this->db->select('patient_master.*,doctor_master.id as doctorid, doctor_master.doctor_name')
+        ->from('patient_master')
+        ->join('doctor_master','patient_master.doctor=doctor_master.id')
+        ->where('patient_master.status',1)
+        ->get()
+        ->result_array();
         $this->load->view('admin/service/top-section', $data);
         $this->load->view('admin/service/patient_form', $data);
         $this->load->view('admin/service/footer', $data);

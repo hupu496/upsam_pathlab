@@ -362,12 +362,12 @@
         <div class="registration-card">
             <div class="card-header">
                 <h5>
-                    <i class="fas fa-users"></i> Patient List
+                    <i class="fas fa-users"></i> Patient Test List
                     <span class="badge bg-primary ms-2"><?php echo $total_patients ?? 0; ?></span>
                 </h5>
                 <div class="d-flex gap-2 flex-wrap">
                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#patientModal" onclick="resetModalForm()">
-                        <i class="fas fa-plus"></i> Add New Patient
+                        <i class="fas fa-plus"></i> Create New Patient Test
                     </button>
                     <button class="btn btn-success btn-sm" onclick="exportPatients()">
                         <i class="fas fa-file-export"></i> Export
@@ -495,7 +495,7 @@
             </div>
             <form id="patientForm" action="<?php echo base_url('admin/patient/save'); ?>" method="POST" novalidate>
                 <div class="modal-body">
-                    <input type="hidden" id="patient_id" name="patient_id" value="">
+                    
                     
                    
                     
@@ -504,7 +504,7 @@
                        
                         <div class="row">
                             <div class="col-md-6 mb-1">
-                                <label class="form-label">Registration Date</label>
+                                <label class="form-label">Report Date</label>
                                 <input type="date" class="form-control" id="registration_date" 
                                        name="registration_date" value="<?php echo date('Y-m-d'); ?>">
                             </div>
@@ -512,12 +512,12 @@
                         <div class="row">
                              <div class="col-md-6">
                                 <label for="" class="form-label">Select Patient</label>
-                                <select class="form-control" id="doctor" name="doctor">
+                                <select class="form-control" id="patient_id" name="patient_id">
                                     <option value="">Select Patient</option>
-                                    <?php foreach($doctor as $row){ ?>
+                                    <?php foreach($patient_list as $row){ ?>
 
                                     <option value="<?php echo $row['id']; ?>">
-                                        <?php echo $row['doctor_name']; ?>
+                                        <?php echo $row['name']; ?>
                                     </option>
 
                                     <?php } ?>
@@ -526,12 +526,12 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="" class="form-label">Select Test</label>
-                                <select class="form-control" id="test_name" name="test_name">
+                                <select class="form-control" id="test_id" name="test_id">
                                     <option value="">Select Test</option>
                                     <?php foreach($product_master as $row){ ?>
 
-                                    <option value="<?php echo $row['product_name']; ?>">
-                                        <?php echo $row['product_name']; ?>
+                                    <option value="<?php echo $row['test_id']; ?>">
+                                        <?php echo $row['name']; ?>
                                     </option>
 
                                     <?php } ?>
@@ -558,14 +558,14 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
 $(document).ready(function(){
-    $("#test_name").change(function(){
-        var product_name = $(this).val();
-        console.log(product_name);
+    $("#test_id").change(function(){
+        var product_id = $(this).val();
+        console.log(product_id);
         $.ajax({
             url:"<?php echo base_url('get-sub-test'); ?>",
             type:"POST",
             data:{
-                product_name:product_name
+                product_id:product_id
             },
             dataType:"json",
             success:function(response){

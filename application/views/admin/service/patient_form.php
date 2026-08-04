@@ -416,9 +416,10 @@
                                 <th>Patient Name</th>
                                 <th>Age</th>
                                 <th>Gender</th>
+                                <th>Doctor</th>
                                 <th>Mobile</th>
                                 <th>Address</th>
-                                <th>Report Date</th>
+                                <th>Registration Date</th>
                                 <th width="150">Action</th>
                             </tr>
                         </thead>
@@ -431,6 +432,7 @@
             <td><?= $row['name']; ?></td>
             <td><?= $row['age']; ?></td>
             <td><?= $row['gender']; ?></td>
+             <td><?= $row['doctor_name']; ?></td>
             <td><?= $row['mobile']; ?></td>
             <td><?= $row['address']; ?></td>
             <td><?= date('d-m-Y',strtotime($row['registration_date'])); ?></td>
