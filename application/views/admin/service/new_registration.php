@@ -494,7 +494,7 @@ if (!function_exists('getColor')) {
                             <i class="fas fa-user-tag"></i> Role Information
                         </div>
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">User Role <span class="required">*</span></label>
                                 <select class="form-select" id="role" name="role" required>
                                     <option value="">Select Role</option>
@@ -503,13 +503,22 @@ if (!function_exists('getColor')) {
 
                                 </select>
                             </div>
-                            <!-- <div class="col-md-6 mb-3">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" id="status" name="status">
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Select Lab <span class="required">*</span></label>
+                                <select class="form-select" id="labid" name="labid" required>
+                                    <option value="">Select Lab</option>
+                                    <?php foreach ($lab as $key => $value) {  ?>
+                                       <option value="<?php echo $value['id']; ?>"><?php echo $value['name']; ?></option>
+                                  <?php  }  ?>
+                                   
                                 </select>
-                            </div> -->
+                            </div>
+                           <div class="col-md-4 mb-3">
+                                <label class="form-label">Select Center <span class="required">*</span></label>
+                                <select class="form-select" id="centerid" name="centerid" required>
+                                    <option value="">Select Center</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     
@@ -527,7 +536,7 @@ if (!function_exists('getColor')) {
         </div>
     </div>
 </div>
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
 $(document).ready(function() {
     // Initialize DataTable
@@ -593,6 +602,46 @@ $(document).ready(function() {
     });
 });
 
+$(document).ready(function () {
+ 
+    $('#labid').on('change', function () {
+     
+        var lab_id = $(this).val();
+
+        console.log("Selected Lab ID:", lab_id);
+
+        if (lab_id == "") {
+            $('#centerid').html('<option value="">Select Center</option>');
+            return;
+        }
+
+        $.ajax({
+            url: "<?= base_url('masters/get_centers_by_lab'); ?>",
+            type: "POST",
+            data: {
+                lab_id: lab_id
+            },
+            dataType: "json",
+            success: function (response) {
+                var html = '<option value="">Select Center</option>';
+
+               $.each(response, function (index, value) {
+                    html += '<option value="' + value.id + '">' +
+                                value.center_name + ' (' + value.center_code + ')' +
+                            '</option>';
+                });
+
+                $('#centerid').html(html);
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+
+    });
+
+});
+
 // Toggle Password Visibility
 function togglePassword() {
     var passwordInput = document.getElementById('password');
@@ -635,47 +684,54 @@ function showToast(message, type) {
 function editUser(id)
 {
     $.ajax({
-        url: "<?php echo base_url('welcome/get/'); ?>" + id,
+        url: "<?= base_url('welcome/get/'); ?>" + id,
         type: "GET",
         dataType: "json",
         success: function(res)
         {
-            console.log(res);
-
             if(res.status == "success")
             {
                 var user = res.data;
 
-                // Hidden ID
                 $("#user_id").val(user.id);
-
-                // Fill form
                 $("#name").val(user.username);
                 $("#phone").val(user.phone);
                 $("#email").val(user.email);
-                $("#password").val(user.password); // or "" if you don't want to show password
+                $("#password").val(user.password);
                 $("#role").val(user.role);
 
-                // Change button text
+                // Select Lab
+                $("#labid").val(String(user.labid)).trigger("change");
+
+                $.ajax({
+                    url: "<?= base_url('masters/get_centers_by_lab'); ?>",
+                    type: "POST",
+                    data: {
+                        lab_id: user.labid
+                    },
+                    dataType: "json",
+                    success: function(response)
+                    {
+                        $("#centerid").empty();
+                        $("#centerid").append('<option value="">Select Center</option>');
+
+                        $.each(response, function(index,row){
+
+                            $("#centerid").append(
+                                '<option value="'+row.id+'">'+
+                                row.center_code+' - '+row.center_name+
+                                '</option>'
+                            );
+
+                        });
+
+                        // Select Center
+                        $("#centerid").val(String(user.centerid));
+                    }
+                });
+
                 $("#submitBtnText").text("Update User");
-
-                // If the form is inside a modal
-                $("#addUserModal").modal("show");
-
-                // If the form is on the same page instead of a modal,
-                // comment the above line and scroll to the form.
-                $('html, body').animate({
-                    scrollTop: $("#registrationForm").offset().top - 80
-                }, 300);
             }
-            else
-            {
-                alert(res.message);
-            }
-        },
-        error:function(xhr)
-        {
-            console.log(xhr.responseText);
         }
     });
 }

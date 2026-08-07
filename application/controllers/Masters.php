@@ -430,6 +430,7 @@ public function product_update()
         $data=[];
            $data['users']= $this->db->get_where('users',array('status>='=>0))->result_array();
            $data['total_users'] = $this->db->get_where('users')->num_rows();
+           $data['lab'] = $this->db->get_where('lab_master',array('status'=>1))->result_array();
            $this->load->view('admin/service/top-section',$data);
            $this->load->view('admin/service/new_registration', $data);
            $this->load->view('admin/service/footer',$data);
@@ -443,6 +444,8 @@ public function product_update()
             'email'=>$data['email'],
             'password'=>$data['password'],
             'role'=>$data['role'],
+            'labid'=>$data['labid'],
+            'centerid'=>$data['centerid'],
             'created_at' => date('Y-m-d H:i:s'),
         ];
         if($user_id == "")
@@ -459,6 +462,19 @@ public function product_update()
       
         redirect('masters/new_registration');
     }
+   public function get_centers_by_lab()
+{
+    $lab_id = $this->input->post('lab_id');
+
+    $centers = $this->db
+        ->where('lab_id', $lab_id)
+        ->where('status', 1)
+        ->get('center_master')
+        ->result_array();
+
+    header('Content-Type: application/json');
+    echo json_encode($centers);
+}
     // main test part
     public function main_test() {
          if(empty($this->session->userdata('userid'))) {

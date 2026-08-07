@@ -30,7 +30,9 @@ public function registration_form(){
         $this->session->set_userdata([
             'userid'   => $result['id'],
             'username' => $result['username'],
-            'role'     => $result['role']
+            'role'     => $result['role'],
+            'labid'   => $result['labid'],
+            'centerid' => $result['centerid']
         ]);
          $this->session->set_flashdata('success', 'activate successfully.');
         redirect('welcome/dashboard');
@@ -44,6 +46,7 @@ public function registration_form(){
          if(empty($this->session->userdata('userid'))) {
             redirect('welcome/index');
         }
+        
        $data['lab']=$this->db->get_where('lab_master',array('status'=>1))->result_array();
        $data['product']=$this->db->get_where('product_master',array('status'=>1))->result_array();
        $data['center']=$this->db->get_where('center_master',array('status'=>1))->result_array();
