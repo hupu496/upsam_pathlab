@@ -46,7 +46,24 @@ public function registration_form(){
          if(empty($this->session->userdata('userid'))) {
             redirect('welcome/index');
         }
-        
+        if($this->session->userdata('role')=='user'){
+            $id = $this->session->userdata('userid');
+            $data['center_lab']=$this->db->select('users.*,lab_master.id,lab_master.name as labname,lab_master.lab_code,lab_master.address,lab_master.email,lab_master.phone,center_master.center_name,center_master.phone as centerphone')
+            ->from('users')
+            ->join('lab_master','lab_master.id = users.labid','left')
+            ->join('center_master','center_master.id=users.centerid')
+            ->where('users.id',$id)
+            ->get()
+            ->result_array();
+            $data['patient'] = $this->db->get_where('patient_master',array('status'=>1,'userid'=>$id))->num_rows();
+            $data['total_test'] = $this->db->get_where('pathology_report',array('userid'=>$id))->num_rows();
+            $data['labcenter']=$this->db->select('users.*,lab_master.id,lab_master.name,lab_master.address,lab_master.lab_code,lab_master.contact')
+            ->from('users')
+            ->join('lab_master','lab_master.id=users.labid')
+            ->where('users.id',$id)
+            ->get()
+            ->result_array();
+        }
        $data['lab']=$this->db->get_where('lab_master',array('status'=>1))->result_array();
        $data['product']=$this->db->get_where('product_master',array('status'=>1))->result_array();
        $data['center']=$this->db->get_where('center_master',array('status'=>1))->result_array();

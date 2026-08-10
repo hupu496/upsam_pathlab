@@ -11,8 +11,8 @@ class Patient extends CI_Controller {
    public function index()
 {
     // Product dropdown
-   
-    $data['product_master'] = $this->db
+    if($this->session->userdata('role')=='admin'){
+        $data['product_master'] = $this->db
         ->select('product_master.*,test_master.id as test_id,test_master.name,test_master.quantity')
         ->from('product_master')
         ->join('test_master','product_master.product_id = test_master.id')
@@ -20,7 +20,7 @@ class Patient extends CI_Controller {
         ->group_by('product_id')
         ->get()
         ->result_array();
-        
+       
     $data['patient_list'] = $this->db->get_where('patient_master',array('report_status'=>0))->result_array();
 
     // Pathology Report List
@@ -41,7 +41,39 @@ class Patient extends CI_Controller {
         ->order_by('pathology_report.id','DESC')
         ->get()
         ->result_array();
-      
+    }else{
+         $data['product_master'] = $this->db
+        ->select('product_master.*,test_master.id as test_id,test_master.name,test_master.quantity')
+        ->from('product_master')
+        ->join('test_master','product_master.product_id = test_master.id')
+        ->where('product_master.status', 1)
+        ->group_by('product_id')
+        ->get()
+        ->result_array();
+        $userid=$this->session->userdata('userid');   
+        $data['patient_list'] = $this->db->get_where('patient_master',array('report_status'=>0,'userid'=>$userid))->result_array();
+
+    // Pathology Report List
+    $data['reports'] = $this->db
+        ->select('
+           pathology_report.id,
+            pathology_report.report_date,
+            pathology_report.test_id,
+            patient_master.id as patientid,
+            patient_master.name,
+            patient_master.age,
+            patient_master.gender,
+            patient_master.mobile,
+            test_master.id as testid,test_master.name as test_name,test_master.quantity,')
+        ->from('patient_master')
+        ->join('pathology_report','pathology_report.patient_id = patient_master.id','left')
+        ->join('test_master','pathology_report.test_id = test_master.id')
+        ->order_by('pathology_report.id','DESC')
+        ->where('patient_master.userid',$userid)
+        ->where('pathology_report.userid',$userid)
+        ->get()
+        ->result_array();
+    }
         $this->load->view('admin/service/top-section', $data);
         $this->load->view('admin/service/patient_registration', $data);
         $this->load->view('admin/service/footer', $data);
@@ -67,9 +99,11 @@ public function save()
     $report = array(
         'patient_id'  => $patient_id,
         'test_id'   => $this->input->post('test_id'),
-        'report_date' => date('Y-m-d')
+        'report_date' => date('Y-m-d'),
+        'userid'     => $this->session->userdata('userid'),
+        'labid'      =>$this->session->userdata('labid'),
+        'centerid'   =>$this->session->userdata('centerid')
     );
-
     $this->db->insert('pathology_report', $report);
     $report_id = $this->db->insert_id();
 
@@ -215,13 +249,27 @@ $data['patient']=$this->db
         // Export logic here
     }
     public function patient_registration(){
+        if($this->session->userdata('role')=='user'){
+          $userid = $this->session->userdata('userid');
+                    $data['doctor'] = $this->db->get_where('doctor_master',array('status'=>1))->result_array();
+        $data['patient'] = $this->db->select('patient_master.*,doctor_master.id as doctorid, doctor_master.doctor_name')
+        ->from('patient_master')
+        ->join('doctor_master','patient_master.doctor=doctor_master.id')
+        ->where('patient_master.status',1)
+        ->where('patient_master.userid',$userid)
+        ->get()
+        ->result_array();
+        }else{
         $data['doctor'] = $this->db->get_where('doctor_master',array('status'=>1))->result_array();
         $data['patient'] = $this->db->select('patient_master.*,doctor_master.id as doctorid, doctor_master.doctor_name')
         ->from('patient_master')
         ->join('doctor_master','patient_master.doctor=doctor_master.id')
         ->where('patient_master.status',1)
+     
         ->get()
         ->result_array();
+        }
+       
         $this->load->view('admin/service/top-section', $data);
         $this->load->view('admin/service/patient_form', $data);
         $this->load->view('admin/service/footer', $data);
@@ -229,7 +277,9 @@ $data['patient']=$this->db
    public function patient_save()
 {
     $patient_id = $this->input->post('patient_id');
-
+    $userid = $this->session->userdata('userid');
+    $labid =  $this->session->userdata('labid');
+    $centerid = $this->session->userdata('centerid');
     $patient = array(
         'name'              => $this->input->post('name'),
         'age'               => $this->input->post('age'),
@@ -237,7 +287,11 @@ $data['patient']=$this->db
         'mobile'            => $this->input->post('mobile'),
         'doctor'            => $this->input->post('doctor'),
         'registration_date' => $this->input->post('registration_date'),
-        'address'           => $this->input->post('address')
+        'address'           => $this->input->post('address'),
+        'labid'             => $labid,
+        'userid'            => $userid,
+        'centerid'          => $centerid,
+
     );
 
     if (!empty($patient_id)) {
@@ -307,6 +361,19 @@ public function get_patient($id)
             'message' => 'Patient not found'
         ]);
     }
+}
+public function all_test_generate(){
+    $id= $this->uri->segment('4');
+    $this->db->where('id',$id);
+    $result = $this->db->update('patient_master',array('report_status'=>'1'));
+    
+    if($result){
+             $this->session->set_flashdata('success', 'Patient test report complete.');
+        } else {
+            $this->session->set_flashdata('error', 'patient test report not complete');
+        }
+        redirect('admin/patient/patient_registration');
+
 }
 }
 ?>

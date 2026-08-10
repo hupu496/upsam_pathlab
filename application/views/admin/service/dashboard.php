@@ -402,26 +402,21 @@
                 <div class="row">
                     <div class="col-md-3 col-6">
                         <div class="quick-stat-item">
-                            <div class="quick-stat-number"><?php echo $active_doctors ?? 0; ?></div>
+                            <div class="quick-stat-number"><?php echo count($doctor) ?? 0; ?></div>
                             <div class="quick-stat-label"><i class="fas fa-circle text-success me-1" style="font-size: 8px;"></i> Active Doctors</div>
                         </div>
                     </div>
+                   
                     <div class="col-md-3 col-6">
                         <div class="quick-stat-item">
-                            <div class="quick-stat-number"><?php echo $inactive_doctors ?? 0; ?></div>
-                            <div class="quick-stat-label"><i class="fas fa-circle text-danger me-1" style="font-size: 8px;"></i> Inactive Doctors</div>
+                            <div class="quick-stat-number"><?php echo $patient ?? 0; ?></div>
+                            <div class="quick-stat-label"><i class="fas fa-plus-circle text-primary me-1"></i>Total Patient Registration</div>
                         </div>
                     </div>
                     <div class="col-md-3 col-6">
                         <div class="quick-stat-item">
-                            <div class="quick-stat-number"><?php echo $new_this_month ?? 0; ?></div>
-                            <div class="quick-stat-label"><i class="fas fa-plus-circle text-primary me-1"></i>Pending Test Report</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="quick-stat-item">
-                            <div class="quick-stat-number"><?php echo $total_appointments ?? 0; ?></div>
-                            <div class="quick-stat-label"><i class="fas fa-calendar-check text-info me-1"></i> Pending Test Collection</div>
+                            <div class="quick-stat-number"><?php echo $total_test ?? 0; ?></div>
+                            <div class="quick-stat-label"><i class="fas fa-calendar-check text-info me-1"></i>Total Test Generate</div>
                         </div>
                     </div>
                 </div>
@@ -439,9 +434,44 @@
                 <i class="fas fa-chart-bar"></i> Center & Lab Distribution
             </div>
             <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="distributionChart"></canvas>
-                </div>
+                <table class="table recent-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Lab Name</th>
+                                <th>Center Name</th>
+                                <th>Lab Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if(isset($center_lab) && !empty($center_lab)): ?>
+                                <?php foreach($center_lab as $center_labs): ?>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-sm me-2">
+                                                    <i class="fas fa-user-circle fa-2x text-secondary"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-semibold"><?php echo $center_labs['labname']; ?></div>
+                                                    <small class="text-muted">ID: <?php echo $center_labs['center_name']; ?></small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><?php echo $center_labs['centerphone']; ?></td>
+                                        <td>
+                                            <span class="status-badge <?php echo $center_labs['lab_code'] ?? 1; ?>">
+                                                <?php echo ucfirst($center_labs['lab_code'] ?? 1); ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-3">Center & Lab Distribution</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
             </div>
         </div>
     </div>
@@ -562,8 +592,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if(isset($lab) && !empty($lab)): ?>
-                                <?php foreach($lab as $labs): ?>
+                            <?php if(isset($labcenter) && !empty($labcenter)): ?>
+                                <?php foreach($labcenter as $labs): ?>
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">

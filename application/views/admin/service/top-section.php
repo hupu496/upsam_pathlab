@@ -532,7 +532,7 @@
                     </a>
                 </div>
                   <?php  }elseif ($this->session->userdata('role')=='user') {  ?>
-                   <div class="nav-item">
+                    <div class="nav-item">
                     <a class="nav-link" data-bs-toggle="collapse" href="#transactionMenu" role="button" 
                        aria-expanded="false" aria-controls="transactionMenu">
                         <i class="fas fa-exchange-alt"></i> Transactions
@@ -540,8 +540,11 @@
                     </a>
                     <div class="collapse" id="transactionMenu">
                         <nav class="nav flex-column">
-                            <a class="nav-link" href="<?php echo base_url('admin/patient'); ?>">
+                            <a class="nav-link" href="<?php echo base_url('admin/patient/patient_registration'); ?>">
                                 <i class="fas fa-user-plus"></i> Patient Registration
+                            </a>
+                             <a class="nav-link" href="<?php echo base_url('admin/patient'); ?>">
+                                <i class="fas fa-user-plus"></i> Test Generate
                             </a>
                            
                         </nav>

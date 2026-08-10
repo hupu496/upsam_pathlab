@@ -405,7 +405,6 @@
                         <i class="fas fa-undo"></i> Reset
                     </button>
                 </div>
-                
                 <!-- Table -->
                 <div class="table-responsive">
                    <table class="table table-bordered table-striped" id="patientTable">
@@ -437,18 +436,37 @@
             <td><?= $row['address']; ?></td>
             <td><?= date('d-m-Y',strtotime($row['registration_date'])); ?></td>
             <td class="text-center">
-                 <a href="javascript:void(0);"
+            <?php if($row['report_status'] == 0){  ?>
+ <a href="<?php echo base_url('admin/patient/all_test_generate/'.$row['id']); ?>"
+                class="btn btn-sm btn-warning"
+                
+                title="Not show Test generation list">
+                    <i class="fas fa-user-check"></i>
+            </a>
+            <a href="javascript:void(0);"
                 class="btn btn-sm btn-success"
                 onclick="editPatient(<?= $row['id']; ?>)"
                 title="Delete">
                     <i class="fas fa-edit"></i>
             </a>
-            <a href="javascript:void(0);"
+             <a href="javascript:void(0);"
                 class="btn btn-sm btn-danger"
                 onclick="deleteReport(<?= $row['id']; ?>)"
                 title="Delete">
                     <i class="fas fa-trash"></i>
                 </a>
+
+         <?php   }else{   ?>
+         <a href="javascript:void(0);"
+                class="btn btn-sm btn-success"
+              
+                title="All Report Generate">
+                  All Report Generate
+            </a>
+           
+        <?php }    ?>
+            
+            
            
 
             </td>

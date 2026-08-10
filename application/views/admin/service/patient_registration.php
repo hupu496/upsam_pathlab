@@ -465,10 +465,10 @@
                                     <td colspan="9">
                                         <div class="text-center py-5">
                                             <i class="fas fa-user-plus fa-4x text-muted mb-3 d-block"></i>
-                                            <h5>No Patients Found</h5>
-                                            <p class="text-muted">Click "Add New Patient" to register your first patient</p>
+                                            <h5>No Patients Test Found</h5>
+                                            <p class="text-muted">Click "Add New Patient Test" to register your first patient</p>
                                             <button class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#patientModal" onclick="resetModalForm()">
-                                                <i class="fas fa-plus"></i> Register Now
+                                                <i class="fas fa-plus"></i> Patient Test
                                             </button>
                                         </div>
                                     </td>
@@ -495,13 +495,8 @@
             </div>
             <form id="patientForm" action="<?php echo base_url('admin/patient/save'); ?>" method="POST" novalidate>
                 <div class="modal-body">
-                    
-                    
-                   
-                    
                     <!-- Contact Information -->
                     <div class="form-section">
-                       
                         <div class="row">
                             <div class="col-md-6 mb-1">
                                 <label class="form-label">Report Date</label>
