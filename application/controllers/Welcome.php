@@ -24,7 +24,10 @@ public function registration_form(){
         'email' => $email,'status'=>1
     ])->row_array();
     
-    if ($result && $result['password'] == $password) {
+
+    if($result){
+
+    if ($result['password'] == $password) {
 
         // Set session if needed
         $this->session->set_userdata([
@@ -34,11 +37,15 @@ public function registration_form(){
             'labid'   => $result['labid'],
             'centerid' => $result['centerid']
         ]);
-         $this->session->set_flashdata('success', 'activate successfully.');
+        $this->session->set_flashdata('success', 'Login successfully.');
         redirect('welcome/dashboard');
 
     } else {
-        $this->session->set_flashdata('error', 'Not active by admin');
+        $this->session->set_flashdata('error', 'Wrong Password');
+        redirect('welcome/index');
+    }
+    }else{
+         $this->session->set_flashdata('error', 'User is not activate');
         redirect('welcome/index');
     }
 }

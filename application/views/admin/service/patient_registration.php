@@ -369,9 +369,7 @@
                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#patientModal" onclick="resetModalForm()">
                         <i class="fas fa-plus"></i> Create New Patient Test
                     </button>
-                    <button class="btn btn-success btn-sm" onclick="exportPatients()">
-                        <i class="fas fa-file-export"></i> Export
-                    </button>
+                   
                     <button class="btn btn-info btn-sm" onclick="refreshTable()">
                         <i class="fas fa-sync"></i> Refresh
                     </button>
@@ -383,15 +381,7 @@
                     <div class="form-group">
                         <input type="text" class="form-control" id="searchInput" placeholder="🔍 Search patients...">
                     </div>
-                    <div class="form-group">
-                        <select class="form-select" id="statusFilter">
-                            <option value="">All Status</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="pending">Pending</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    </div>
+                   
                     <div class="form-group">
                         <select class="form-select" id="ageFilter">
                             <option value="">All Ages</option>

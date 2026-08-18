@@ -369,9 +369,7 @@
                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#patientModal" onclick="resetModalForm()">
                         <i class="fas fa-plus"></i> Add New Patient
                     </button>
-                    <button class="btn btn-success btn-sm" onclick="exportPatients()">
-                        <i class="fas fa-file-export"></i> Export
-                    </button>
+                    
                     <button class="btn btn-info btn-sm" onclick="refreshTable()">
                         <i class="fas fa-sync"></i> Refresh
                     </button>
@@ -386,10 +384,9 @@
                     <div class="form-group">
                         <select class="form-select" id="statusFilter">
                             <option value="">All Status</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="pending">Pending</option>
-                            <option value="completed">Completed</option>
+                       
+                            <option value="Test Pending">Pending</option>
+                            <option value="All Report Generate">Completed</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -437,11 +434,12 @@
             <td><?= date('d-m-Y',strtotime($row['registration_date'])); ?></td>
             <td class="text-center">
             <?php if($row['report_status'] == 0){  ?>
- <a href="<?php echo base_url('admin/patient/all_test_generate/'.$row['id']); ?>"
+            <a href="<?php echo base_url('admin/patient/all_test_generate/'.$row['id']); ?>"
                 class="btn btn-sm btn-warning"
+                style="font-weight:500,color: #fff;"
                 
                 title="Not show Test generation list">
-                    <i class="fas fa-user-check"></i>
+                   Test Pending
             </a>
             <a href="javascript:void(0);"
                 class="btn btn-sm btn-success"
@@ -459,7 +457,7 @@
          <?php   }else{   ?>
          <a href="javascript:void(0);"
                 class="btn btn-sm btn-success"
-              
+                style="font-weight:500"
                 title="All Report Generate">
                   All Report Generate
             </a>
@@ -699,7 +697,7 @@ $(document).ready(function() {
     // Status Filter
     $('#statusFilter').on('change', function() {
         var status = this.value;
-        table.column(7).search(status).draw();
+        table.column(9).search(status).draw();
     });
     
    

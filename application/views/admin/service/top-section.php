@@ -8,6 +8,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.8/css/dataTables.dataTables.css">
+    <link rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
     <style>
         /* Reset and Base */
         * {
@@ -493,15 +498,13 @@
                     <div class="collapse" id="reportMenu">
                         <nav class="nav flex-column">
                            
-                            <a class="nav-link" href="<?php echo base_url('admin/reports/monthly'); ?>">
+                            <a class="nav-link" href="<?php echo base_url('admin/service'); ?>">
                                 <i class="fas fa-calendar-alt"></i> Date Range Report
                             </a>
-                            <a class="nav-link" href="<?php echo base_url('admin/reports/doctor_wise'); ?>">
+                            <a class="nav-link" href="<?php echo base_url('admin/service/doctor_wise'); ?>">
                                 <i class="fas fa-user-md"></i> Doctor-wise Report
                             </a>
-                            <a class="nav-link" href="<?php echo base_url('admin/reports/test_wise'); ?>">
-                                <i class="fas fa-flask"></i> Test-wise Report
-                            </a>
+                           
                         </nav>
                     </div>
                 </div>
@@ -559,14 +562,11 @@
                     <div class="collapse" id="reportMenu">
                         <nav class="nav flex-column">
                            
-                            <a class="nav-link" href="<?php echo base_url('admin/reports/monthly'); ?>">
+                            <a class="nav-link" href="<?php echo base_url('admin/service'); ?>">
                                 <i class="fas fa-calendar-alt"></i> Date Range Report
                             </a>
-                            <a class="nav-link" href="<?php echo base_url('admin/reports/doctor_wise'); ?>">
+                            <a class="nav-link" href="<?php echo base_url('admin/service/doctor_wise'); ?>">
                                 <i class="fas fa-user-md"></i> Doctor-wise Report
-                            </a>
-                            <a class="nav-link" href="<?php echo base_url('admin/reports/test_wise'); ?>">
-                                <i class="fas fa-flask"></i> Test-wise Report
                             </a>
                         </nav>
                     </div>
