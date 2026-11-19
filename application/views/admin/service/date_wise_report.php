@@ -188,8 +188,13 @@
 
                 <?php } else { ?>
 
+                    <?php
+                    // Must match the number of <th> in thead, otherwise
+                    // DataTables throws "Incorrect column count".
+                    $col_count = 11 + ($this->session->userdata('role') == 'admin' ? 1 : 0);
+                    ?>
                     <tr>
-                        <td colspan="11" class="text-center">
+                        <td colspan="<?php echo $col_count; ?>" class="text-center">
                             No patient records found
                         </td>
                     </tr>

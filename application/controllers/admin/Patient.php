@@ -39,6 +39,7 @@ class Patient extends CI_Controller {
         ->from('patient_master')
         ->join('pathology_report','pathology_report.patient_id = patient_master.id','left')
         ->join('test_master','pathology_report.test_id = test_master.id')
+        ->order_by('pathology_report.report_date','DESC')
         ->order_by('pathology_report.id','DESC')
         ->get()
         ->result_array();
@@ -70,6 +71,7 @@ class Patient extends CI_Controller {
         ->from('patient_master')
         ->join('pathology_report','pathology_report.patient_id = patient_master.id','left')
         ->join('test_master','pathology_report.test_id = test_master.id')
+        ->order_by('pathology_report.report_date','DESC')
         ->order_by('pathology_report.id','DESC')
         ->where('patient_master.userid',$userid)
         ->where('pathology_report.userid',$userid)
@@ -221,7 +223,7 @@ public function generate_report($id)
         redirect('admin/patient');
     }
 
-    $data['title'] = 'Generate Report';
+    $data['title'] = 'Save Report';
     $this->load->view('admin/service/top-section', $data);
     $this->load->view('admin/service/generate_report_form', $data);
     $this->load->view('admin/service/footer', $data);

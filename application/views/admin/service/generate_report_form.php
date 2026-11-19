@@ -122,7 +122,7 @@
         <div class="gen-report-card">
             <div class="card-header">
                 <h5>
-                    <i class="fas fa-file-medical-alt"></i> Generate Report
+                    <i class="fas fa-file-medical-alt"></i> Save Report
                     <span class="badge bg-primary ms-2">RPT<?php echo str_pad($report['report_id'],5,'0',STR_PAD_LEFT); ?></span>
                 </h5>
                 <a href="<?php echo base_url('admin/patient'); ?>" class="btn btn-sm btn-outline-secondary">
@@ -155,7 +155,7 @@
                         <strong><?php echo !empty($report['doctor_name']) ? $report['doctor_name'] : '-'; ?></strong>
                     </div>
                     <div class="meta-item">
-                        <small>Report Date</small>
+                        <small>Enter Date</small>
                         <strong><?php echo date('d-m-Y', strtotime($report['report_date'])); ?></strong>
                     </div>
                 </div>
@@ -206,12 +206,12 @@
 
                     <div class="form-text mt-2">
                         <i class="fas fa-info-circle"></i>
-                        Enter the result value for each selected sub test, then click "Generate Report".
+                        Enter the result value for each selected sub test, then click "Save Report".
                     </div>
 
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary" id="generateBtn">
-                            <i class="fas fa-file-medical-alt"></i> Generate Report
+                            <i class="fas fa-file-medical-alt"></i> Save Report
                         </button>
                         <a href="<?php echo base_url('admin/patient'); ?>" class="btn btn-outline-secondary">
                             <i class="fas fa-times"></i> Cancel

@@ -408,7 +408,7 @@
                                 <th>Gender</th>
                                 <th>Mobile</th>
                                 <th>Test Name</th>
-                                <th>Report Date</th>
+                                <th>Enter Date</th>
                                 <th width="150">Action</th>
                             </tr>
                         </thead>
@@ -434,7 +434,7 @@
                 <a href="<?= base_url('admin/patient/generate-report/'.$row['id']); ?>"
                    class="btn btn-sm btn-primary"
                    title="Enter values and generate report">
-                    <i class="fas fa-file-medical-alt"></i> Generate Report
+                    <i class="fas fa-file-medical-alt"></i> Save Report
                 </a>
 
                 <?php } else { ?>
@@ -555,7 +555,7 @@
                         <i class="fas fa-times"></i> Cancel
                     </button>
                     <button type="submit" class="btn btn-primary" id="submitBtn">
-                        <i class="fas fa-save"></i> <span id="submitBtnText">Save Patient</span>
+                        <i class="fas fa-save"></i> <span id="submitBtnText">Save Test</span>
                     </button>
                 </div>
             </form>
@@ -730,6 +730,8 @@ $(document).ready(function() {
         pageLength: 10,
         responsive: true,
         ordering: true,
+        // Keep the server-side report_date DESC order as-is on load
+        order: [],
         language: {
             search: "Search:",
             lengthMenu: "Show _MENU_ patients per page",
@@ -847,7 +849,7 @@ function showToast(message, type) {
 // Reset Modal Form
 function resetModalForm() {
     $('#modalFormTitle').text('Create Test');
-    $('#submitBtnText').text('Save Patient');
+    $('#submitBtnText').text('Save Test');
     $('#patient_id').val('');
     $('#patientForm')[0].reset();
     $('#patientForm').find('.error').removeClass('error');

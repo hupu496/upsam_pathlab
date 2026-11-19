@@ -459,7 +459,7 @@
                                 <?php }}else{ ?>
                            
                                 <tr>
-                                    <td colspan="9">
+                                    <td colspan="10">
                                         <div class="text-center py-5">
                                             <i class="fas fa-user-plus fa-4x text-muted mb-3 d-block"></i>
                                             <h5>No Patients Found</h5>
