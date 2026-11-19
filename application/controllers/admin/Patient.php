@@ -21,7 +21,7 @@ class Patient extends CI_Controller {
         ->get()
         ->result_array();
        
-    $data['patient_list'] = $this->db->get_where('patient_master',array('report_status'=>0))->result_array();
+    $data['patient_list'] = $this->db->get('patient_master')->result_array();
 
     // Pathology Report List
     $data['reports'] = $this->db
@@ -29,6 +29,7 @@ class Patient extends CI_Controller {
            pathology_report.id,
             pathology_report.report_date,
             pathology_report.test_id,
+            pathology_report.status,
             patient_master.id as patientid,
             patient_master.name,
             patient_master.age,
@@ -51,7 +52,7 @@ class Patient extends CI_Controller {
         ->get()
         ->result_array();
         $userid=$this->session->userdata('userid');   
-        $data['patient_list'] = $this->db->get_where('patient_master',array('report_status'=>0,'userid'=>$userid))->result_array();
+        $data['patient_list'] = $this->db->get_where('patient_master',array('userid'=>$userid))->result_array();
 
     // Pathology Report List
     $data['reports'] = $this->db
@@ -59,6 +60,7 @@ class Patient extends CI_Controller {
            pathology_report.id,
             pathology_report.report_date,
             pathology_report.test_id,
+            pathology_report.status,
             patient_master.id as patientid,
             patient_master.name,
             patient_master.age,
@@ -92,6 +94,27 @@ public function get_sub_test()
 
     echo json_encode($data);
 }
+public function search_by_mobile()
+{
+    $mobile = trim($this->input->post('mobile'));
+
+    if ($mobile === '') {
+        echo json_encode(['status' => 'error', 'message' => 'Please enter a mobile number.']);
+        return;
+    }
+
+    $patients = $this->db
+        ->where('mobile', $mobile)
+        ->get('patient_master')
+        ->result_array();
+
+    if (empty($patients)) {
+        echo json_encode(['status' => 'error', 'message' => 'No patient found with this mobile number.']);
+        return;
+    }
+
+    echo json_encode(['status' => 'success', 'data' => $patients]);
+}
 public function save()
 {   
     $patient_id = $this->input->post('patient_id');
@@ -100,6 +123,7 @@ public function save()
         'patient_id'  => $patient_id,
         'test_id'   => $this->input->post('test_id'),
         'report_date' => date('Y-m-d'),
+        'status'      => 0,   # 0 = values not entered yet (Generate Report shown)
         'userid'     => $this->session->userdata('userid'),
         'labid'      =>$this->session->userdata('labid'),
         'centerid'   =>$this->session->userdata('centerid')
@@ -108,16 +132,17 @@ public function save()
     $report_id = $this->db->insert_id();
 
     // Save Report Details
+    # sub_product_id[] is a checkbox - only checked rows are posted
+    # result_value is keyed by sub product id: result_value[<id>]
     $product_ids = $this->input->post('sub_product_id');
     $results     = $this->input->post('result_value');
-    
-    #which columns having values then save that particular column which column is not values not save on database
-    #means which product_ids having result values that product show on and save on database
+
+    #only the ticked sub tests are saved, with the value entered (default 00)
 if (!empty($product_ids)) {
 
-    foreach ($product_ids as $k => $id) {
+    foreach ($product_ids as $id) {
 
-        $result = isset($results[$k]) ? trim($results[$k]) : '';
+        $result = isset($results[$id]) ? trim($results[$id]) : '';
 
         // Skip if result is empty
         if ($result == '') {
@@ -151,15 +176,16 @@ if (!empty($product_ids)) {
         show_error('Unable to save report.');
     }
 
-    redirect('admin/patient/report/'.$report_id);
+    $this->session->set_flashdata('success', 'Test created successfully. Click "Generate Report" to view it.');
+    redirect('admin/patient');
 }
 public function report($id)
 {
     $data['patient']=$this->db
-    ->select('patient_master.*,test_master.id as testid, test_master.name as test_name,test_master.quantity,pathology_report.test_id,pathology_report.patient_id,pathology_report.report_date,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
+    ->select('pathology_report.id as report_id,patient_master.*,test_master.id as testid, test_master.name as test_name,test_master.quantity,pathology_report.test_id,pathology_report.patient_id,pathology_report.report_date,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
     ->from('pathology_report')
     ->join('patient_master','patient_master.id=pathology_report.patient_id')
-    ->join('doctor_master','doctor_master.id = patient_master.doctor')
+    ->join('doctor_master','doctor_master.id = patient_master.doctor','left')
     ->join('test_master','pathology_report.test_id=test_master.id')
     ->where('pathology_report.id',$id)
     ->get()
@@ -171,6 +197,66 @@ public function report($id)
     ->result_array();
     $this->load->view('admin/service/report',$data);
 }
+
+# Step 1: Open the entry form for the selected (checked) sub tests
+public function generate_report($id)
+{
+    $data['report'] = $this->db
+    ->select('pathology_report.id as report_id,patient_master.*,test_master.id as testid, test_master.name as test_name,test_master.quantity,pathology_report.test_id,pathology_report.patient_id,pathology_report.report_date,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
+    ->from('pathology_report')
+    ->join('patient_master','patient_master.id=pathology_report.patient_id')
+    ->join('doctor_master','doctor_master.id = patient_master.doctor','left')
+    ->join('test_master','pathology_report.test_id=test_master.id')
+    ->where('pathology_report.id',$id)
+    ->get()
+    ->row_array();
+
+    $data['details'] = $this->db
+    ->where('report_id',$id)
+    ->get('pathology_report_details')
+    ->result_array();
+
+    if (empty($data['report'])) {
+        $this->session->set_flashdata('error', 'Report not found.');
+        redirect('admin/patient');
+    }
+
+    $data['title'] = 'Generate Report';
+    $this->load->view('admin/service/top-section', $data);
+    $this->load->view('admin/service/generate_report_form', $data);
+    $this->load->view('admin/service/footer', $data);
+}
+
+# Step 2: Save the entered values, then generate (open) the report
+public function save_report_values($id)
+{
+    $values = $this->input->post('result_value');   # result_value[<detail_id>] => entered value
+
+    if (!empty($values)) {
+        foreach ($values as $detail_id => $val) {
+
+            $val = trim($val);
+
+            # Only update rows belonging to this report
+            $this->db
+                ->where('id', (int)$detail_id)
+                ->where('report_id', (int)$id)
+                ->update('pathology_report_details', array('result_value' => $val));
+        }
+    }
+
+    # Report generated -> update report date to now and mark status as generated (1)
+    $this->db
+        ->where('id', (int)$id)
+        ->update('pathology_report', array(
+            'report_date' => date('Y-m-d H:i:s'),
+            'status'      => 1
+        ));
+
+    $this->session->set_flashdata('success', 'Report generated successfully.');
+    redirect('admin/patient/report/'.$id);
+}
+
     public function get($id) {
         $patient = $this->Patient_model->get($id);
         if ($patient) {
@@ -219,10 +305,10 @@ public function report($id)
    public function print($id)
 {
 $data['patient']=$this->db
-    ->select('patient_master.*,test_master.id as testid, test_master.name as test_name,test_master.quantity,pathology_report.test_id,pathology_report.patient_id,pathology_report.report_date,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
+    ->select('pathology_report.id as report_id,patient_master.*,test_master.id as testid, test_master.name as test_name,test_master.quantity,pathology_report.test_id,pathology_report.patient_id,pathology_report.report_date,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
     ->from('pathology_report')
     ->join('patient_master','patient_master.id=pathology_report.patient_id')
-    ->join('doctor_master','doctor_master.id = patient_master.doctor')
+    ->join('doctor_master','doctor_master.id = patient_master.doctor','left')
     ->join('test_master','pathology_report.test_id=test_master.id')
     ->where('pathology_report.id',$id)
     ->get()

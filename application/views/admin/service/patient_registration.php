@@ -363,7 +363,7 @@
             <div class="card-header">
                 <h5>
                     <i class="fas fa-users"></i> Patient Test List
-                    <span class="badge bg-primary ms-2"><?php echo $total_patients ?? 0; ?></span>
+                    <span class="badge bg-primary ms-2"><?php echo isset($reports) ? count($reports) : 0; ?></span>
                 </h5>
                 <div class="d-flex gap-2 flex-wrap">
                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#patientModal" onclick="resetModalForm()">
@@ -427,11 +427,17 @@
 
             <td class="text-center">
 
-                <a href="<?= base_url('admin/patient/report/'.$row['id']); ?>"
-                   class="btn btn-sm btn-info"
-                   title="View Report">
-                    <i class="fas fa-eye"></i>
+                <?php $isGenerated = isset($row['status']) && (int)$row['status'] === 1; ?>
+
+                <?php if(!$isGenerated){ ?>
+
+                <a href="<?= base_url('admin/patient/generate-report/'.$row['id']); ?>"
+                   class="btn btn-sm btn-primary"
+                   title="Enter values and generate report">
+                    <i class="fas fa-file-medical-alt"></i> Generate Report
                 </a>
+
+                <?php } else { ?>
 
                 <a href="<?= base_url('admin/patient/print/'.$row['id']); ?>"
                    target="_blank"
@@ -446,6 +452,8 @@
                 title="Delete">
                     <i class="fas fa-trash"></i>
                 </a>
+
+                <?php } ?>
 
             </td>
         </tr>
@@ -492,6 +500,19 @@
                                 <label class="form-label">Report Date</label>
                                 <input type="date" class="form-control" id="registration_date" 
                                        name="registration_date" value="<?php echo date('Y-m-d'); ?>">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Search Patient by Mobile</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="mobile_search"
+                                           name="mobile_search" placeholder="Type mobile number to filter..." maxlength="15" autocomplete="off">
+                                    <button class="btn btn-outline-primary" type="button" id="mobileSearchBtn">
+                                        <i class="fas fa-search"></i> Search
+                                    </button>
+                                </div>
+                                <div id="mobile_search_result" class="mt-2"></div>
                             </div>
                         </div>
                         <div class="row">
@@ -543,6 +564,17 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
+// Patient list embedded for instant "type-to-filter" search (no server round-trip)
+var PATIENTS = <?php echo json_encode(array_map(function($p){
+    return array(
+        'id'      => $p['id'],
+        'name'    => $p['name'],
+        'mobile'  => isset($p['mobile']) ? (string)$p['mobile'] : '',
+        'age'     => isset($p['age']) ? $p['age'] : '',
+        'gender'  => isset($p['gender']) ? $p['gender'] : '',
+        'address' => isset($p['address']) ? $p['address'] : ''
+    );
+}, isset($patient_list) ? $patient_list : array())); ?>;
 $(document).ready(function(){
     $("#test_id").change(function(){
         var product_id = $(this).val();
@@ -559,6 +591,7 @@ $(document).ready(function(){
                 var html='';
                 html+='<table class="table table-bordered">';
                 html+='<tr>';
+                html+='<th width="50"><input type="checkbox" id="checkAllSub" checked title="Select All"></th>';
                 html+='<th>Sub Test</th>';
                 html+='<th>Result</th>';
                 html+='<th>Normal Value</th>';
@@ -569,13 +602,16 @@ $(document).ready(function(){
 
                     html+='<tr>';
 
-                    html+='<td>';
-                    html+=row.sub_product;
-                    html+='<input type="hidden" name="sub_product_id[]" value="'+row.id+'">';
+                    html+='<td class="text-center">';
+                    html+='<input type="checkbox" class="sub_check" name="sub_product_id[]" value="'+row.id+'" checked>';
                     html+='</td>';
 
                     html+='<td>';
-                    html+='<input type="text" class="form-control" name="result_value[]">';
+                    html+=row.sub_product;
+                    html+='</td>';
+
+                    html+='<td>';
+                    html+='<input type="text" class="form-control result_input" name="result_value['+row.id+']" value="00">';
                     html+='</td>';
 
                     html+='<td>'+row.normal_values+'</td>';
@@ -587,6 +623,7 @@ $(document).ready(function(){
                 });
 
                 html+='</table>';
+                html+='<div class="form-text">Tick the sub tests to include in the report. Unchecked rows are not saved.</div>';
 
                 $("#sub_test_div").html(html);
 
@@ -598,6 +635,92 @@ $(document).ready(function(){
 
         });
 
+    });
+
+    // Select all / unselect all sub test checkboxes (delegated - table is re-rendered)
+    $(document).on('change', '#checkAllSub', function(){
+        $('.sub_check').prop('checked', $(this).is(':checked'));
+    });
+    $(document).on('change', '.sub_check', function(){
+        var total = $('.sub_check').length;
+        var checked = $('.sub_check:checked').length;
+        $('#checkAllSub').prop('checked', total > 0 && total === checked);
+    });
+
+    // ===== Live patient search: type mobile number -> auto filter -> list shows below =====
+    var searchTimer = null;
+
+    function renderPatientResults(patients, query){
+        if(!query){
+            $('#mobile_search_result').html('');
+            return;
+        }
+
+        if(patients.length === 0){
+            $('#mobile_search_result').html('<div class="text-danger small">No patient found with this mobile number.</div>');
+            return;
+        }
+
+        var html = '<div class="list-group">';
+        $.each(patients, function(i, p){
+            html += '<button type="button" class="list-group-item list-group-item-action patient-pick" data-id="'+p.id+'" data-name="'+String(p.name).replace(/"/g,'&quot;')+'">';
+            html += '<strong>'+p.name+'</strong> ('+(p.gender||'')+', '+(p.age||'')+')<br>';
+            html += '<small class="text-muted">'+(p.mobile||'')+' &middot; '+(p.address||'')+'</small>';
+            html += '</button>';
+        });
+        html += '</div>';
+        $('#mobile_search_result').html(html);
+
+        // Auto select when exactly one match
+        if(patients.length === 1){
+            selectPatient(patients[0].id);
+        }
+    }
+
+    function filterPatientsByMobile(){
+        var query = $('#mobile_search').val().trim();
+
+        if(query === ''){
+            $('#mobile_search_result').html('');
+            return;
+        }
+
+        // Match mobile number starting with / containing the typed digits
+        var matches = $.grep(PATIENTS, function(p){
+            return String(p.mobile || '').indexOf(query) !== -1;
+        });
+
+        renderPatientResults(matches, query);
+    }
+
+    // Automatic filtering while typing (debounced)
+    $('#mobile_search').on('input', function(){
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(filterPatientsByMobile, 250);
+    });
+
+    // Search button / Enter key still works as an explicit trigger
+    function searchPatientByMobile(){
+        clearTimeout(searchTimer);
+        filterPatientsByMobile();
+    }
+
+    function selectPatient(id){
+        if($('#patient_id option[value="'+id+'"]').length === 0){
+            // patient may not be in the loaded list - add it
+            var name = $('.patient-pick[data-id="'+id+'"]').data('name') || '';
+            $('#patient_id').append($('<option>').val(id).text(name || ('Patient #'+id)));
+        }
+        $('#patient_id').val(id);
+        $('#mobile_search_result').html('<div class="text-success small"><i class="fas fa-check-circle"></i> Patient selected.</div>');
+    }
+
+    $('#mobileSearchBtn').on('click', searchPatientByMobile);
+    $('#mobile_search').on('keypress', function(e){
+        if(e.which === 13){ e.preventDefault(); searchPatientByMobile(); }
+    });
+    $(document).on('click', '.patient-pick', function(){
+        selectPatient($(this).data('id'));
     });
 
 });
@@ -723,12 +846,15 @@ function showToast(message, type) {
 
 // Reset Modal Form
 function resetModalForm() {
-    $('#modalFormTitle').text('Patient Registration');
+    $('#modalFormTitle').text('Create Test');
     $('#submitBtnText').text('Save Patient');
     $('#patient_id').val('');
     $('#patientForm')[0].reset();
     $('#patientForm').find('.error').removeClass('error');
     $('#patientForm').find('.success').removeClass('success');
+    $('#mobile_search').val('');
+    $('#mobile_search_result').html('');
+    $('#sub_test_div').html('');
 }
 
 // Edit Patient - Load data into modal

@@ -101,7 +101,7 @@ if(isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST']=='localhost' || $_SERV
 }
 else{
 	defined('DB_HOST')      ? null : define('DB_HOST', 'localhost');
-	defined('DB_USER')      ? null : define('DB_USER', 'root');
-	defined('DB_PASSWORD')  ? null : define('DB_PASSWORD', '');
-	defined('DB_NAME')      ? null : define('DB_NAME', '');
+	defined('DB_USER')      ? null : define('DB_USER', 'vukapqlh_upsam');
+	defined('DB_PASSWORD')  ? null : define('DB_PASSWORD', '!_?S(p[zZ*W@I;bo');
+	defined('DB_NAME')      ? null : define('DB_NAME', 'vukapqlh_upsam');
 }

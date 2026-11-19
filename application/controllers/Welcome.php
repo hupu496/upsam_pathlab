@@ -19,7 +19,6 @@ public function registration_form(){
 {
     $email = $this->input->post('email');
     $password = $this->input->post('password');
-
     $result = $this->db->get_where('users', [
         'email' => $email,'status'=>1
     ])->row_array();

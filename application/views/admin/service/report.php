@@ -705,7 +705,7 @@ padding:0;
         <div class="label">Patient’s Name</div>
         <div class="value"><?php echo htmlspecialchars($patient['name'] ?? 'N/A'); ?></div>
         <div class="label"><?php echo $patient['age']; ?>/<?php echo $patient['gender']; ?></div>
-        <div class="value">Patient’s ID:<?php echo $patient['id']; ?></div>
+        <div class="value">Patient’s ID:<?php echo $patient['patient_id']; ?></div>
 
         <div class="ref-row">Ref By. Dr.</div>
         <div class="ref-doctor"><?php echo $patient['doctor_name']; ?></div>
@@ -722,7 +722,7 @@ padding:0;
 
         <div class="report-label">Reporting Date</div>
         <div class="report-date"> <?php 
-                        $reportDate = $patient['registration_date'] ?? '';
+                        $reportDate = $patient['report_date'] ?? '';
                         if (!empty($reportDate)) {
                             echo date('M d, Y', strtotime($reportDate));
                         } else {

@@ -433,36 +433,23 @@
             <td><?= $row['address']; ?></td>
             <td><?= date('d-m-Y',strtotime($row['registration_date'])); ?></td>
             <td class="text-center">
-            <?php if($row['report_status'] == 0){  ?>
-            <a href="<?php echo base_url('admin/patient/all_test_generate/'.$row['id']); ?>"
-                class="btn btn-sm btn-warning"
-                style="font-weight:500,color: #fff;"
-                
-                title="Not show Test generation list">
-                   Test Pending
-            </a>
-            <a href="javascript:void(0);"
-                class="btn btn-sm btn-success"
-                onclick="editPatient(<?= $row['id']; ?>)"
-                title="Delete">
-                    <i class="fas fa-edit"></i>
-            </a>
-             <a href="javascript:void(0);"
-                class="btn btn-sm btn-danger"
-                onclick="deleteReport(<?= $row['id']; ?>)"
-                title="Delete">
-                    <i class="fas fa-trash"></i>
-                </a>
+          
 
-         <?php   }else{   ?>
-         <a href="javascript:void(0);"
-                class="btn btn-sm btn-success"
-                style="font-weight:500"
-                title="All Report Generate">
-                  All Report Generate
-            </a>
-           
-        <?php }    ?>
+
+        <a href="javascript:void(0);"
+           class="btn btn-sm btn-success"
+           onclick="editPatient(<?= $row['id']; ?>)"
+           title="Edit">
+            <i class="fas fa-edit"></i>
+        </a>
+
+        <a href="javascript:void(0);"
+           class="btn btn-sm btn-danger"
+           onclick="deleteReport(<?= $row['id']; ?>)"
+           title="Delete">
+            <i class="fas fa-trash"></i>
+        </a>
+
             
             
            

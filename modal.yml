@@ -1,0 +1,237 @@
+- generic [ref=f7e2]:
+  - generic [ref=f7e3]:
+    - generic [ref=f7e4]:
+      - generic [ref=f7e5]: 
+      - heading "Upsam Diagnostic" [level=5] [ref=f7e6]
+      - text: Pathology Lab Management
+    - navigation [ref=f7e7]:
+      - link " Dashboard" [ref=f7e9] [cursor=pointer]:
+        - /url: http://localhost/upsam_pathlab/dashboard
+        - generic [ref=f7e10]: 
+        - text: Dashboard
+      - generic [ref=f7e11]:
+        - button " Master " [ref=f7e12] [cursor=pointer]:
+          - generic [ref=f7e13]: 
+          - text: Master
+          - generic [ref=f7e14]: 
+        - text:     
+      - generic [ref=f7e16]:
+        - button " Transactions " [ref=f7e17] [cursor=pointer]:
+          - generic [ref=f7e18]: 
+          - text: Transactions
+          - generic [ref=f7e19]: 
+        - text:  
+      - generic [ref=f7e21]:
+        - button " Reports " [ref=f7e22] [cursor=pointer]:
+          - generic [ref=f7e23]: 
+          - text: Reports
+          - generic [ref=f7e24]: 
+        - text:  
+      - generic [ref=f7e26]:
+        - button " User Management " [ref=f7e27] [cursor=pointer]:
+          - generic [ref=f7e28]: 
+          - text: User Management
+          - generic [ref=f7e29]: 
+        - text: 
+      - link " Logout" [ref=f7e33] [cursor=pointer]:
+        - /url: http://localhost/upsam_pathlab/welcome/logout
+        - generic [ref=f7e34]: 
+        - text: Logout
+  - generic [ref=f7e35]:
+    - generic [ref=f7e36]:
+      - generic [ref=f7e37]:
+        - text: 
+        - heading " Dashboard" [level=4] [ref=f7e38]:
+          - generic [ref=f7e39]: 
+          - text: Dashboard
+      - generic [ref=f7e40]:
+        - generic [ref=f7e41]:
+          - generic [ref=f7e42]: 
+          - text: admin
+        - generic [ref=f7e43]: A
+        - generic [ref=f7e44]: admin
+        - text: 
+    - generic [ref=f7e45]:
+      - generic: 
+      - generic [ref=f7e48]:
+        - generic [ref=f7e49]:
+          - heading " Patient Test List 6" [level=5] [ref=f7e50]:
+            - generic [ref=f7e51]: 
+            - text: Patient Test List
+            - generic [ref=f7e52]: "6"
+          - generic [ref=f7e53]:
+            - button "+ Create New Patient Test" [ref=f7e54] [cursor=pointer]:
+              - generic [ref=f7e55]: +
+              - text: Create New Patient Test
+            - button " Refresh" [ref=f7e56] [cursor=pointer]:
+              - generic [ref=f7e57]: 
+              - text: Refresh
+        - generic [ref=f7e58]:
+          - generic [ref=f7e59]:
+            - textbox "🔍 Search patients..." [ref=f7e61]
+            - combobox [ref=f7e63]:
+              - option "All Ages" [selected]
+              - option "0-18 Years"
+              - option "19-30 Years"
+              - option "31-50 Years"
+              - option "51+ Years"
+            - button " Reset" [ref=f7e64] [cursor=pointer]:
+              - generic [ref=f7e65]: 
+              - text: Reset
+          - generic [ref=f7e67]:
+            - generic [ref=f7e69]:
+              - text: Show
+              - combobox "Show patients per page" [ref=f7e70]:
+                - option "10" [selected]
+                - option "25"
+                - option "50"
+                - option "100"
+              - text: patients per page
+            - generic [ref=f7e72]:
+              - text: "Search:"
+              - searchbox "Search:" [ref=f7e73]
+            - table [ref=f7e74]:
+              - rowgroup [ref=f7e75]:
+                - row [ref=f7e76]:
+                  - 'columnheader "#: activate to sort column descending" [ref=f7e77] [cursor=pointer]': "#"
+                  - 'columnheader "Report No: activate to sort column ascending" [ref=f7e78] [cursor=pointer]': Report No
+                  - 'columnheader "Patient Name: activate to sort column ascending" [ref=f7e79] [cursor=pointer]': Patient Name
+                  - 'columnheader "Age: activate to sort column ascending" [ref=f7e80] [cursor=pointer]': Age
+                  - 'columnheader "Gender: activate to sort column ascending" [ref=f7e81] [cursor=pointer]': Gender
+                  - 'columnheader "Mobile: activate to sort column ascending" [ref=f7e82] [cursor=pointer]': Mobile
+                  - 'columnheader "Test Name: activate to sort column ascending" [ref=f7e83] [cursor=pointer]': Test Name
+                  - 'columnheader "Report Date: activate to sort column ascending" [ref=f7e84] [cursor=pointer]': Report Date
+                  - columnheader "Action" [ref=f7e85]
+              - rowgroup [ref=f7e86]:
+                - row [ref=f7e87]:
+                  - cell "1" [ref=f7e88]
+                  - cell "RPT00010" [ref=f7e89]
+                  - cell "sonakshi" [ref=f7e90]
+                  - cell "28" [ref=f7e91]
+                  - cell "Female" [ref=f7e92]
+                  - cell "7412589630" [ref=f7e93]
+                  - cell "CBC" [ref=f7e94]
+                  - cell "18-11-2026" [ref=f7e95]
+                  - cell [ref=f7e96]:
+                    - link "" [ref=f7e97] [cursor=pointer]:
+                      - /url: http://localhost/upsam_pathlab/admin/patient/print/10
+                    - link "" [ref=f7e99] [cursor=pointer]:
+                      - /url: javascript:void(0);
+                - row [ref=f7e101]:
+                  - cell "2" [ref=f7e102]
+                  - cell "RPT00009" [ref=f7e103]
+                  - cell "kunal" [ref=f7e104]
+                  - cell "28" [ref=f7e105]
+                  - cell "Female" [ref=f7e106]
+                  - cell "7999669691" [ref=f7e107]
+                  - cell "CBC" [ref=f7e108]
+                  - cell "15-11-2026" [ref=f7e109]
+                  - cell [ref=f7e110]:
+                    - link " Generate Report" [ref=f7e111] [cursor=pointer]:
+                      - /url: http://localhost/upsam_pathlab/admin/patient/generate-report/9
+                      - generic [ref=f7e112]: 
+                      - text: Generate Report
+                - row [ref=f7e113]:
+                  - cell "3" [ref=f7e114]
+                  - cell "RPT00008" [ref=f7e115]
+                  - cell "kunal" [ref=f7e116]
+                  - cell "28" [ref=f7e117]
+                  - cell "Female" [ref=f7e118]
+                  - cell "7999669691" [ref=f7e119]
+                  - cell "KFT" [ref=f7e120]
+                  - cell "15-11-2026" [ref=f7e121]
+                  - cell [ref=f7e122]:
+                    - link "" [ref=f7e123] [cursor=pointer]:
+                      - /url: http://localhost/upsam_pathlab/admin/patient/print/8
+                    - link "" [ref=f7e125] [cursor=pointer]:
+                      - /url: javascript:void(0);
+                - row [ref=f7e127]:
+                  - cell "4" [ref=f7e128]
+                  - cell "RPT00007" [ref=f7e129]
+                  - cell "fghfgh" [ref=f7e130]
+                  - cell "50" [ref=f7e131]
+                  - cell "Male" [ref=f7e132]
+                  - cell "5645646546" [ref=f7e133]
+                  - cell "CBC" [ref=f7e134]
+                  - cell "13-11-2026" [ref=f7e135]
+                  - cell [ref=f7e136]:
+                    - link "" [ref=f7e137] [cursor=pointer]:
+                      - /url: http://localhost/upsam_pathlab/admin/patient/print/7
+                    - link "" [ref=f7e139] [cursor=pointer]:
+                      - /url: javascript:void(0);
+                - row [ref=f7e141]:
+                  - cell "5" [ref=f7e142]
+                  - cell "RPT00006" [ref=f7e143]
+                  - cell "Bharat patra" [ref=f7e144]
+                  - cell "30" [ref=f7e145]
+                  - cell "Male" [ref=f7e146]
+                  - cell "7412589630" [ref=f7e147]
+                  - cell "CBC" [ref=f7e148]
+                  - cell "12-11-2026" [ref=f7e149]
+                  - cell [ref=f7e150]:
+                    - link "" [ref=f7e151] [cursor=pointer]:
+                      - /url: http://localhost/upsam_pathlab/admin/patient/print/6
+                    - link "" [ref=f7e153] [cursor=pointer]:
+                      - /url: javascript:void(0);
+                - row [ref=f7e155]:
+                  - cell "6" [ref=f7e156]
+                  - cell "RPT00005" [ref=f7e157]
+                  - cell "kunal" [ref=f7e158]
+                  - cell "28" [ref=f7e159]
+                  - cell "Female" [ref=f7e160]
+                  - cell "7999669691" [ref=f7e161]
+                  - cell "CBC" [ref=f7e162]
+                  - cell "12-11-2026" [ref=f7e163]
+                  - cell [ref=f7e164]:
+                    - link "" [ref=f7e165] [cursor=pointer]:
+                      - /url: http://localhost/upsam_pathlab/admin/patient/print/5
+                    - link "" [ref=f7e167] [cursor=pointer]:
+                      - /url: javascript:void(0);
+            - status [ref=f7e169]: Showing 1 to 6 of 6 patients
+            - generic [ref=f7e170]:
+              - link "Previous" [disabled] [ref=f7e171]
+              - link "1" [ref=f7e173] [cursor=pointer]
+              - link "Next" [disabled] [ref=f7e174]
+      - dialog " Create Test" [active] [ref=f7e175]:
+        - generic [ref=f7e176]:
+          - generic [ref=f7e177]:
+            - heading " Create Test" [level=5] [ref=f7e178]:
+              - generic [ref=f7e179]: 
+              - text: Create Test
+            - button "Close" [ref=f7e180] [cursor=pointer]
+          - generic [ref=f7e181]:
+            - generic [ref=f7e183]:
+              - generic [ref=f7e185]:
+                - generic [ref=f7e186]: Report Date
+                - textbox [ref=f7e187]: 2026-11-18
+              - generic [ref=f7e189]:
+                - generic [ref=f7e190]: Search Patient by Mobile
+                - generic [ref=f7e191]:
+                  - textbox "Type mobile number to filter..." [ref=f7e192]
+                  - button " Search" [ref=f7e193] [cursor=pointer]:
+                    - generic [ref=f7e194]: 
+                    - text: Search
+              - generic [ref=f7e195]:
+                - generic [ref=f7e196]:
+                  - generic [ref=f7e197]: Select Patient
+                  - combobox [ref=f7e198]:
+                    - option "Select Patient" [selected]
+                    - option "Nibedita Biswas"
+                    - option "kunal"
+                    - option "Bharat patra"
+                    - option "fghfgh"
+                    - option "sonakshi"
+                - generic [ref=f7e199]:
+                  - generic [ref=f7e200]: Select Test
+                  - combobox [ref=f7e201]:
+                    - option "Select Test" [selected]
+                    - option "CBC"
+                    - option "KFT"
+              - separator [ref=f7e202]
+            - generic [ref=f7e203]:
+              - button " Cancel" [ref=f7e204] [cursor=pointer]:
+                - generic [ref=f7e205]: 
+                - text: Cancel
+              - button " Save Patient" [ref=f7e206] [cursor=pointer]:
+                - generic [ref=f7e207]: 
+                - text: Save Patient

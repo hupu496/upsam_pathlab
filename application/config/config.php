@@ -24,10 +24,10 @@ date_default_timezone_set('Asia/Kolkata');
 |
 */
 if(isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST']=='localhost') ){
-	$config['base_url'] = "https://$_SERVER[HTTP_HOST]/upsam_pathlab/";
+	$config['base_url'] = "http://$_SERVER[HTTP_HOST]/upsam_pathlab/";
 }
 else{
-	$config['base_url'] = "https://6c31-59-97-166-32.ngrok-free.app/teachnicalseaservice/";
+	$config['base_url'] = "https://pathlab.comsysit.in/";
 }
 
 /*
@@ -40,7 +40,7 @@ else{
 | variable so that it is blank.
 |
 */
-// $config['index_page'] = '';
+$config['index_page'] = '';
 
 /*
 |--------------------------------------------------------------------------
