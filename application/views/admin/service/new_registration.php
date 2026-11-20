@@ -408,15 +408,9 @@ if (!function_exists('getColor')) {
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <tr>
-                                    <td colspan="8">
-                                        <div class="text-center py-5">
-                                            <i class="fas fa-user-plus fa-4x text-muted mb-3 d-block"></i>
-                                            <h5>No Users Found</h5>
-                                            <p class="text-muted">Register a new user using the form below</p>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <!-- Empty state is rendered by DataTables
+                                     (language.emptyTable) - a custom <tr>
+                                     here causes "Incorrect column count". -->
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -544,7 +538,15 @@ $(document).ready(function() {
         pageLength: 10,
         responsive: true,
         ordering: true,
+        // Rendered by DataTables itself (correct colspan) - do NOT put a
+        // custom empty <tr> in the tbody, it causes "Incorrect column count".
         language: {
+            emptyTable: '<div class="text-center py-5">' +
+                '<i class="fas fa-user-plus fa-4x text-muted mb-3 d-block"></i>' +
+                '<h5>No Users Found</h5>' +
+                '<p class="text-muted mb-0">Register a new user using the form below</p>' +
+                '</div>',
+            zeroRecords: "No matching users found",
             search: "Search:",
             lengthMenu: "Show _MENU_ users per page",
             info: "Showing _START_ to _END_ of _TOTAL_ users",

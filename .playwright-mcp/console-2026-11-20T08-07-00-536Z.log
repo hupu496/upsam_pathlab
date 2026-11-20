@@ -1,0 +1,6 @@
+[ 7095060ms] [WARNING] Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently @ http://localhost/upsam_pathlab/admin/patient/print/10:963
+[ 7444018ms] [WARNING] Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently @ http://localhost/upsam_pathlab/admin/patient/print/10:964
+[ 7449355ms] [WARNING] Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently @ http://localhost/upsam_pathlab/admin/patient/print/10:964
+[ 7588062ms] [WARNING] Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently @ http://localhost/upsam_pathlab/admin/patient/report/10:964
+[ 7671405ms] ReferenceError: $ is not defined
+    at http://localhost/upsam_pathlab/admin/patient/generate-report/10:854:1

@@ -56,6 +56,13 @@ $(document).ready(function () {
 
         responsive: true,
 
+        // Rendered by DataTables itself (correct colspan) - do NOT put a
+        // custom empty <tr> in the tbody, it causes "Incorrect column count".
+        language: {
+            emptyTable: "No patient records found",
+            zeroRecords: "No patient records found"
+        },
+
         dom:
             '<"row mb-3"' +
                 '<"col-md-8"B>' +
@@ -161,6 +168,13 @@ $(document).ready(function () {
         ],
 
         responsive: true,
+
+        // Rendered by DataTables itself (correct colspan) - do NOT put a
+        // custom empty <tr> in the tbody, it causes "Incorrect column count".
+        language: {
+            emptyTable: "No report records found",
+            zeroRecords: "No report records found"
+        },
 
         // Layout
         dom:

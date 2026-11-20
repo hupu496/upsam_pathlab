@@ -622,7 +622,11 @@
 
 @media print{
 
+.no-print{
 
+display:none !important;
+
+}
 
 body{
 
@@ -653,10 +657,110 @@ padding:0;
 }
 
 }
+  /* ===== Letter head (With / Without) option ===== */
+  .letterhead-option{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:#fff;
+    border:1px solid #dee2e6;
+    border-radius:5px;
+    padding:10px 16px;
+    font-size:14px;
+    color:#333;
+    box-shadow:0 1px 4px rgba(0,0,0,.06);
+  }
+  .letterhead-option .lh-title{
+    font-weight:700;
+    text-transform:uppercase;
+    font-size:12px;
+    letter-spacing:.5px;
+    color:#6c757d;
+  }
+  .letterhead-option label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin:0;
+    cursor:pointer;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .letterhead-option input[type="radio"]{ cursor:pointer; }
+  .action-bar{ flex-wrap:wrap; }
+
+  /* Default = WITHOUT letter head: hide company name, address & design
+     -> every printed/PDF page shows data only, no letter head. */
+  body:not(.with-letterhead) .brand-header{ display:none; }
+
+  /* ===== MULTI-PAGE PRINT WITH LETTER HEAD ==============================
+     WITH Letter Head: "Print Report" prints prepared A4 page blocks -
+     each block = one letter head band + its slice of the report content,
+     separated with page breaks. Every printed page therefore carries the
+     letter head and no row is ever covered or lost. */
+  #lhPrintPages { display: none; }
+  body.lh-print-mode .report-card,
+  body.lh-print-mode .action-bar { display: none !important; }
+  /* Each print block is EXACTLY one full-bleed A4 sheet (210x297mm).
+     With @page { margin: 0 } the browser maps one block to one page, so
+     every page carries its own letter head band and nothing is clipped. */
+  .lh-print-page {
+      width: 210mm;
+      height: 297mm;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+  }
+  .lh-print-page:last-child {
+      page-break-after: auto;
+      break-after: auto;
+  }
+  .lh-print-page img {
+      display: block;
+      width: 210mm;
+      height: 297mm;
+      margin: 0;
+  }
+  @media print {
+      body.lh-print-mode { margin: 0 !important; padding: 0 !important; }
+      body.lh-print-mode #lhPrintPages { display: block !important; }
+  }
+
+  /* "Preparing..." overlay while the letter head pages are built
+     (class no-print -> never printed) */
+  #lhPreparing {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.92);
+      font-weight: 600;
+      font-size: 15px;
+      color: #344767;
+  }
+
   </style>
 </head>
-<body>
+<body<?php echo !empty($patient['letter_head']) ? ' class="with-letterhead"' : ''; ?>>
 <div class="action-bar no-print">
+
+    <div class="letterhead-option">
+        <span class="lh-title">Letter Head</span>
+        <label>
+            <input type="radio" name="letterHead" id="lhWith" value="with"
+                   <?php echo !empty($patient['letter_head']) ? 'checked' : ''; ?>>
+            With Letter Head
+        </label>
+        <label>
+            <input type="radio" name="letterHead" id="lhWithout" value="without"
+                   <?php echo empty($patient['letter_head']) ? 'checked' : ''; ?>>
+            Without Letter Head
+        </label>
+    </div>
 
     <button class="btn btn-print" onclick="printReport()">
         <i class="fa fa-print"></i> Print Report
@@ -671,7 +775,7 @@ padding:0;
   <!-- report content -->
   <div class="report-content">
     <!-- ===== header: border.png background + doctor icon + logo ===== -->
-    <div class="brand-header">
+    <div class="brand-header" id="brandHeader">
         
       <div class="header-left">
         <!-- doctor_icon.png (left) -->
@@ -821,37 +925,297 @@ padding:0;
 </div> <!-- /report-card -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
+   /* ===== Letter head (With / Without) =====================================
+      Default / saved choice comes from the generate-report page
+      (pathology_report.letter_head); the radios here preview it and drive
+      the on-screen preview, the printed pages and the downloaded PDF. */
+   var LH = (function () {
+       var withLH = document.getElementById('lhWith');
+       var withoutLH = document.getElementById('lhWithout');
+       var headerEl = document.getElementById('brandHeader');
+       var composedCache = {}; // sliceH -> canvas: report body + a letter head band per page
+
+       function apply() {
+           document.body.classList.toggle('with-letterhead', !!(withLH && withLH.checked));
+           composedCache = {};    // choice changed -> rebuild the pages
+       }
+       if (withLH && withoutLH) {
+           withLH.addEventListener('change', apply);
+           withoutLH.addEventListener('change', apply);
+           apply();            // sync screen with the saved choice
+       }
+
+       function isEnabled() { return !!(withLH && withLH.checked && headerEl); }
+
+       // A4 (297x210mm) with 5mm margins -> same slice height html2pdf uses
+       function sliceHeight(w) { return Math.floor(w * (297 - 10) / (210 - 10)); }
+
+       // Full-bleed A4 slice height (no margins) -> used by the PRINT flow,
+       // where every page block is exactly 210x297mm.
+       function a4SliceHeight(w) { return Math.round(w * 297 / 210); }
+
+       // Render any element to a canvas through html2pdf / html2canvas
+       function renderCanvas(el, cb) {
+           html2pdf().set({
+               margin: 0,
+               html2canvas: {
+                   scale: 2,
+                   useCORS: true,
+                   backgroundColor: '#ffffff',
+                   onrendered: function (c) { cb(c); }
+               },
+               jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+           }).from(el).toCanvas();
+       }
+
+       // Find a near-white row within [lo, hi] (scanning downward) so a page
+       // is cut BETWEEN two rows instead of through one. Returns hi when no
+       // blank line exists there (tainted canvas, watermark in the way, ...).
+       function snapCut(sctx, W, lo, hi) {
+           if (!sctx || lo > hi) { return hi; }
+           var h = hi - lo + 2, y, x, i, img;
+           try { img = sctx.getImageData(0, lo, W, h); }
+           catch (e) { return hi; }
+           var d = img.data;
+           for (y = hi; y >= lo; y--) {
+               var off = (y - lo) * W * 4, white = true;
+               for (x = 0; x < W; x++) {
+                   i = off + x * 4;
+                   if (d[i] + d[i + 1] + d[i + 2] < 740) { white = false; break; }
+               }
+               if (white) { return y; }
+           }
+           return hi;
+       }
+
+       // Build a canvas where EVERY page slice starts with the letter head
+       // band; the content is shifted down by the band so nothing is ever
+       // covered or lost.  src = report canvas captured WITHOUT the header.
+       function buildComposed(src, hdr, sliceH) {
+           var W = src.width, H = src.height;
+           sliceH = sliceH || sliceHeight(W);
+           var band = Math.round(hdr.height * (W / hdr.width));
+           if (band <= 0 || band >= sliceH) { return null; }
+           var cap = sliceH - band;                       // content rows per page
+           var pages = Math.max(1, Math.ceil(H / cap));
+
+           // Cut points BETWEEN rows: start from evenly spaced ideals and snap
+           // each to a blank line within +/-48px, clamped so every segment
+           // still fits on one page. Segments stay contiguous and cover
+           // [0, H) exactly -> nothing lost, nothing repeated, page count
+           // stays at the minimum.
+           var cuts = [0], sctx = null;
+           try { sctx = src.getContext('2d'); } catch (e) {}
+           var prev = 0, ok = !!sctx && pages > 1;
+           for (var u = 1; ok && u < pages; u++) {
+               var ideal = Math.round(u * H / pages);
+               var lo = Math.max(prev + 1, ideal - 48, H - (pages - u) * cap);
+               var hi = Math.min(prev + cap, ideal + 48, H - 1);
+               var cut = snapCut(sctx, W, lo, hi);
+               if (cut <= prev) { cut = prev + 1; }
+               if (cut > prev + cap) { cut = prev + cap; }
+               if (cut < H - (pages - u) * cap) { cut = H - (pages - u) * cap; }
+               if (cut > prev + cap || cut <= prev || cut >= H) { ok = false; break; }
+               cuts.push(cut);
+               prev = cut;
+           }
+           if (!ok) {                                   // fall back to fixed slices
+               cuts = [];
+               for (var k = 0; k < pages; k++) { cuts.push(k * cap); }
+           }
+
+           var out = document.createElement('canvas');
+           out.width = W;
+           out.height = pages * sliceH;
+           var ctx = out.getContext('2d');
+           ctx.fillStyle = '#fff';
+           ctx.fillRect(0, 0, out.width, out.height);
+           for (var u2 = 0; u2 < pages; u2++) {
+               var sy = cuts[u2];
+               var ey = (u2 + 1 < pages) ? cuts[u2 + 1] : H;
+               var sh = ey - sy;
+               if (sh <= 0) { continue; }
+               ctx.drawImage(src, 0, sy, W, sh, 0, u2 * sliceH + band, W, sh);
+               ctx.drawImage(hdr, 0, 0, hdr.width, hdr.height, 0, u2 * sliceH, W, band);
+           }
+           return out;
+       }
+
+       // letter head canvas + report canvas (header hidden) -> composed canvas.
+       // mode selects the page geometry: 'a4' = full-bleed 210x297mm blocks
+       // (PRINT flow), 'm5' = html2pdf's 5mm-margin slices (PDF DOWNLOAD).
+       function getComposed(mode, cb) {
+           if (composedCache[mode]) { cb(composedCache[mode]); return; }
+           renderCanvas(headerEl, function (hdr) {
+               var prev = headerEl.style.display;
+               headerEl.style.display = 'none';
+               renderCanvas(document.getElementById('reportContent'), function (body) {
+                   headerEl.style.display = prev;
+                   var sh = (mode === 'm5') ? sliceHeight(body.width)
+                                            : a4SliceHeight(body.width);
+                   composedCache[mode] = buildComposed(body, hdr, sh) || body;
+                   cb(composedCache[mode]);
+               });
+           });
+       }
+
+       return {
+           isEnabled: isEnabled,
+           sliceHeight: sliceHeight,
+           a4SliceHeight: a4SliceHeight,
+           buildComposed: buildComposed,
+           getComposed: getComposed,
+           header: function () { return headerEl; }
+       };
+   })();
+
+   // Build the A4 letter-head page blocks (one letter head per page);
+   // cb() fires once #lhPrintPages + print-mode are in place.
+   function prepareLetterHeadPages(cb) {
+       var host = document.getElementById('lhPrintPages');
+       if (host) { host.parentNode.removeChild(host); }
+
+       var busy = document.getElementById('lhPreparing');
+       if (!busy) {
+           busy = document.createElement('div');
+           busy.id = 'lhPreparing';
+           busy.className = 'no-print';
+           busy.textContent = 'Preparing letter head report…';
+           document.body.appendChild(busy);
+       }
+
+       // full-bleed A4: every page block below is exactly 210x297mm, so the
+       // browser never has to guess where a page ends (no drift, no blanks)
+       var pageRule = document.getElementById('lhPageRule');
+       if (!pageRule) {
+           pageRule = document.createElement('style');
+           pageRule.id = 'lhPageRule';
+           document.head.appendChild(pageRule);
+       }
+       pageRule.textContent = '@page { size: A4; margin: 0; }';
+
+       LH.getComposed('a4', function (comp) {
+           var W = comp.width;
+           var sliceH = LH.a4SliceHeight(W);
+           var pages = Math.max(1, Math.round(comp.height / sliceH));
+
+           host = document.createElement('div');
+           host.id = 'lhPrintPages';
+           for (var u = 0; u < pages; u++) {
+               // one A4 page = letter head band + its slice of content
+               var sl = document.createElement('canvas');
+               sl.width = W;
+               sl.height = sliceH;
+               var c = sl.getContext('2d');
+               c.fillStyle = '#fff';
+               c.fillRect(0, 0, W, sliceH);
+               // slice: source rect (0, u*sliceH, W, sliceH) -> this page
+               c.drawImage(comp, 0, u * sliceH, W, sliceH, 0, 0, W, sliceH);
+
+               var page = document.createElement('div');
+               page.className = 'lh-print-page';
+               var img = document.createElement('img');
+               img.src = sl.toDataURL('image/jpeg', 0.92);
+               page.appendChild(img);
+               host.appendChild(page);
+           }
+           document.body.appendChild(host);
+           document.body.classList.add('lh-print-mode');
+           if (cb) { cb(); }
+       });
+   }
+
+   function cleanupLetterHeadPrint() {
+       document.body.classList.remove('lh-print-mode');
+       var host = document.getElementById('lhPrintPages');
+       if (host && host.parentNode) { host.parentNode.removeChild(host); }
+       var b = document.getElementById('lhPreparing');
+       if (b && b.parentNode) { b.parentNode.removeChild(b); }
+       var pageRule = document.getElementById('lhPageRule');
+       if (pageRule) { pageRule.textContent = ''; }
+   }
+
    function printReport() {
-    window.print();
-}
+       // WITHOUT letter head -> print the page as-is; the header is
+       // display:none (CSS), so no printed page shows it.
+       // WITH letter head -> print prepared A4 page blocks; every block
+       // carries its own letter head (multi-page reports included).
+       if (!LH.isEnabled()) { window.print(); return; }
+       prepareLetterHeadPages(function () {
+           window.addEventListener('afterprint', cleanupLetterHeadPrint);
+           window.print();
+       });
+   }
 
 function downloadReport() {
 
     const element = document.getElementById("reportContent");
 
+    const cfg = {
+        margin: 5,
+        filename: 'Pathology_Report.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // WITHOUT letter head: .brand-header is display:none (CSS) so it never
+    // reaches the canvas -> every PDF page shows data only.
+    if (!LH.isEnabled()) {
+        html2pdf().set(cfg).from(element).save();
+        return;
+    }
+
+    // WITH letter head: html2pdf renders the report as ONE tall canvas and
+    // slices it, so the header would only land on page 1. Fix: capture the
+    // letter head separately, render the report WITHOUT its in-flow header,
+    // then stamp a letter head band on every page slice (content shifted
+    // down by the band -> nothing covered, nothing lost).
     html2pdf().set({
+        margin: 0,
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            onrendered: function (hdrCanvas) {
+                const headerEl = LH.header();
+                let hidden = false;
+                const showHeader = function () {
+                    if (hidden) { headerEl.style.display = ''; hidden = false; }
+                };
 
-        margin:5,
-        filename:'Pathology_Report.pdf',
+                hidden = true;
+                headerEl.style.display = 'none';
 
-        image:{
-            type:'jpeg',
-            quality:1
+                html2pdf().set({
+                    margin: cfg.margin,
+                    filename: cfg.filename,
+                    image: cfg.image,
+                    jsPDF: cfg.jsPDF,
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        onrendered: function (canvas) {
+                            try {
+                                const out = LH.buildComposed(canvas, hdrCanvas);
+                                if (out) {
+                                    // write into the SAME canvas object html2pdf slices
+                                    canvas.width = out.width;
+                                    canvas.height = out.height;
+                                    canvas.getContext('2d').drawImage(out, 0, 0);
+                                }
+                            } finally {
+                                showHeader();
+                            }
+                        }
+                    }
+                }).from(element).save();
+
+                setTimeout(showHeader, 15000);   // safety net if rendering fails
+            }
         },
-
-        html2canvas:{
-            scale:2,
-            useCORS:true
-        },
-
-        jsPDF:{
-            unit:'mm',
-            format:'a4',
-            orientation:'portrait'
-        }
-
-    }).from(element).save();
-
+        jsPDF: cfg.jsPDF
+    }).from(LH.header()).toCanvas();
 }
 </script>
 </body>

@@ -237,18 +237,6 @@
 
                     <?php endforeach; ?>
 
-                <?php else: ?>
-
-                    <tr>
-                        <td
-                            colspan="9"
-                            class="text-center">
-
-                            No report records found
-
-                        </td>
-                    </tr>
-
                 <?php endif; ?>
 
                 </tbody>

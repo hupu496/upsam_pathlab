@@ -96,6 +96,47 @@
         border-top: 2px solid #f8f9fc;
     }
 
+    /* ----- Letter head choice (chosen before saving the report) ----- */
+    .letterhead-choice {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        background: #f8f9fc;
+        border: 1px solid #e3e8f0;
+        border-radius: 12px;
+        padding: 15px 18px;
+        margin-top: 22px;
+    }
+    .letterhead-choice .lh-label {
+        font-weight: 700;
+        color: #344767;
+        font-size: .9rem;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        white-space: nowrap;
+    }
+    .letterhead-choice .lh-label i { color: #5e72e4; margin-right: 6px; }
+    .letterhead-choice .lh-options { display: flex; gap: 18px; flex-wrap: wrap; }
+    .letterhead-choice .lh-opt {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin: 0;
+        cursor: pointer;
+        font-weight: 600;
+        color: #344767;
+        font-size: .9rem;
+        white-space: nowrap;
+    }
+    .letterhead-choice .lh-opt input { cursor: pointer; }
+    .letterhead-choice .lh-help {
+        flex-basis: 100%;
+        margin: 0;
+        color: #8898aa;
+        font-size: .8rem;
+    }
+
     @media (max-width: 768px) {
         .gen-report-card .card-header { flex-direction: column; align-items: stretch; }
         .entry-table { display: block; overflow-x: auto; white-space: nowrap; }
@@ -207,6 +248,34 @@
                     <div class="form-text mt-2">
                         <i class="fas fa-info-circle"></i>
                         Enter the result value for each selected sub test, then click "Save Report".
+                    </div>
+
+                    <!-- Letter head option - chosen BEFORE saving the report -->
+                    <div class="letterhead-choice">
+                        <div class="lh-label">
+                            <i class="fas fa-heading"></i> Letter Head
+                        </div>
+                        <div class="lh-options">
+                            <label class="lh-opt">
+                                <input type="radio"
+                                       name="letter_head"
+                                       value="0"
+                                       <?php echo empty($report['letter_head']) ? 'checked' : ''; ?>>
+                                Without Letter Head
+                            </label>
+                            <label class="lh-opt">
+                                <input type="radio"
+                                       name="letter_head"
+                                       value="1"
+                                       <?php echo !empty($report['letter_head']) ? 'checked' : ''; ?>>
+                                With Letter Head
+                            </label>
+                        </div>
+                        <p class="lh-help">
+                            <i class="fas fa-info-circle"></i>
+                            Without Letter Head (default): report data only — company name, address and design are hidden.
+                            With Letter Head: the full letter head design is printed.
+                        </p>
                     </div>
 
                     <div class="form-actions">

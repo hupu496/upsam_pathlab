@@ -184,7 +184,7 @@ if (!empty($product_ids)) {
 public function report($id)
 {
     $data['patient']=$this->db
-    ->select('pathology_report.id as report_id,patient_master.*,test_master.id as testid, test_master.name as test_name,test_master.quantity,pathology_report.test_id,pathology_report.patient_id,pathology_report.report_date,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
+    ->select('pathology_report.id as report_id,patient_master.*,test_master.id as testid, test_master.name as test_name,test_master.quantity,pathology_report.test_id,pathology_report.patient_id,pathology_report.report_date,pathology_report.letter_head,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
     ->from('pathology_report')
     ->join('patient_master','patient_master.id=pathology_report.patient_id')
     ->join('doctor_master','doctor_master.id = patient_master.doctor','left')
@@ -204,7 +204,7 @@ public function report($id)
 public function generate_report($id)
 {
     $data['report'] = $this->db
-    ->select('pathology_report.id as report_id,patient_master.*,test_master.id as testid, test_master.name as test_name,test_master.quantity,pathology_report.test_id,pathology_report.patient_id,pathology_report.report_date,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
+    ->select('pathology_report.id as report_id,patient_master.*,test_master.id as testid, test_master.name as test_name,test_master.quantity,pathology_report.test_id,pathology_report.patient_id,pathology_report.report_date,pathology_report.letter_head,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
     ->from('pathology_report')
     ->join('patient_master','patient_master.id=pathology_report.patient_id')
     ->join('doctor_master','doctor_master.id = patient_master.doctor','left')
@@ -247,12 +247,16 @@ public function save_report_values($id)
         }
     }
 
+    # Letter head choice made on the generate-report page (0 = Without, 1 = With)
+    $letter_head = $this->input->post('letter_head') == 1 ? 1 : 0;
+
     # Report generated -> update report date to now and mark status as generated (1)
     $this->db
         ->where('id', (int)$id)
         ->update('pathology_report', array(
             'report_date' => date('Y-m-d H:i:s'),
-            'status'      => 1
+            'status'      => 1,
+            'letter_head' => $letter_head
         ));
 
     $this->session->set_flashdata('success', 'Report generated successfully.');
@@ -307,7 +311,7 @@ public function save_report_values($id)
    public function print($id)
 {
 $data['patient']=$this->db
-    ->select('pathology_report.id as report_id,patient_master.*,test_master.id as testid, test_master.name as test_name,test_master.quantity,pathology_report.test_id,pathology_report.patient_id,pathology_report.report_date,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
+    ->select('pathology_report.id as report_id,patient_master.*,test_master.id as testid, test_master.name as test_name,test_master.quantity,pathology_report.test_id,pathology_report.patient_id,pathology_report.report_date,pathology_report.letter_head,doctor_master.id,doctor_master.doctor_name,doctor_master.doctor_code')
     ->from('pathology_report')
     ->join('patient_master','patient_master.id=pathology_report.patient_id')
     ->join('doctor_master','doctor_master.id = patient_master.doctor','left')

@@ -457,19 +457,10 @@
             </td>
         </tr>
                                 <?php }}else{ ?>
-                           
-                                <tr>
-                                    <td colspan="10">
-                                        <div class="text-center py-5">
-                                            <i class="fas fa-user-plus fa-4x text-muted mb-3 d-block"></i>
-                                            <h5>No Patients Found</h5>
-                                            <p class="text-muted">Click "Add New Patient" to register your first patient</p>
-                                            <button class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#patientModal" onclick="resetModalForm()">
-                                                <i class="fas fa-plus"></i> Register Now
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+
+                                    <!-- Empty state is rendered by DataTables
+                                         (language.emptyTable) - a custom <tr>
+                                         here causes "Incorrect column count". -->
                             <?php } ?>
                         </tbody>
                     </table>
@@ -663,7 +654,17 @@ $(document).ready(function() {
         pageLength: 10,
         responsive: true,
         ordering: true,
+        // Rendered by DataTables itself (correct colspan) - do NOT put a
+        // custom empty <tr> in the tbody, it causes "Incorrect column count".
         language: {
+            emptyTable: '<div class="text-center py-5">' +
+                '<i class="fas fa-user-plus fa-4x text-muted mb-3 d-block"></i>' +
+                '<h5>No Patients Found</h5>' +
+                '<p class="text-muted mb-2">Click "Create New Patient" to register your first patient</p>' +
+                '<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#patientModal" onclick="resetModalForm()">' +
+                '<i class="fas fa-plus"></i> Register Now</button>' +
+                '</div>',
+            zeroRecords: "No matching patients found",
             search: "Search:",
             lengthMenu: "Show _MENU_ patients per page",
             info: "Showing _START_ to _END_ of _TOTAL_ patients",
